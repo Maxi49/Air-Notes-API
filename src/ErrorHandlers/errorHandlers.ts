@@ -29,3 +29,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
     });
   }
 }
+
+/*
+  test credentials: {
+  "email": "webframed8@gmail.com",
+  "password": "testword1234089237410"
+}*/

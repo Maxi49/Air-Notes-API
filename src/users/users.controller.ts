@@ -72,7 +72,6 @@ export class UserController {
     @Req() req: IRequest,
   ): Promise<boolean> {
     const id = req.id;
-    console.log('hasta aca llegue amiguito');
     await this.usersService.updateUserPass(id, password);
     return true;
   }

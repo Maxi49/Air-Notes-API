@@ -1,18 +1,24 @@
 import {
   BadRequestException,
-  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import {
-  Auth,
+  getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  Auth,
 } from 'firebase/auth';
+import { FirebaseAuthConfig } from './firebaseAuth.config';
 
 @Injectable()
 export class FirebaseAuthService {
-  constructor(@Inject('FIREBASE_AUTH') private auth: Auth) {}
+  private auth: Auth;
+
+  constructor() {
+    FirebaseAuthConfig.initializeFirebase();
+    this.auth = getAuth();
+  }
 
   async register(email: string, pass: string) {
     try {

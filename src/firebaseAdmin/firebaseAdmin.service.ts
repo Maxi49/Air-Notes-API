@@ -1,13 +1,13 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import * as admin from 'firebase-admin';
-import { FirebaseConfig } from './Firebase.config';
+import { FirebaseAdminConfig } from './firebaseAdmin.config';
 
 @Injectable()
 export class FirebaseAdminService {
   private auth: admin.auth.Auth;
 
   constructor() {
-    FirebaseConfig.initializeFirebase();
+    FirebaseAdminConfig.initializeFirebase();
     this.auth = admin.auth();
   }
 

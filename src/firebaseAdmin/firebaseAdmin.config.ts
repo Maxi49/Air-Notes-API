@@ -7,6 +7,6 @@ export class FirebaseAdminConfig {
       credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
       databaseURL: 'https://air-notes-65be4-default-rtdb.firebaseio.com/',
     });
-    console.log('Firebase has been initialize');
+    console.log('Firebase Admin initialized');
   }
 }

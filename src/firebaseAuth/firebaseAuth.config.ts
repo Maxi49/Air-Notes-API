@@ -14,6 +14,7 @@ export class FirebaseAuthConfig {
     };
 
     const app = initializeApp(firebaseConfig);
+    console.log('Firebase Auth initialized');
 
     return getAuth(app);
   }

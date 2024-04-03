@@ -21,7 +21,7 @@ export class AuthGuard implements CanActivate {
       console.log('Token', decodedToken);
       req.user = decodedToken;
       req.id = decodedToken.uid;
-      return true;
+      return true; // Siempre devolver true en un Guard
     } catch (error) {
       console.log(error);
       throw new UnauthorizedException(error);

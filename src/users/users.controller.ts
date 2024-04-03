@@ -62,7 +62,7 @@ export class UserController {
   ): Promise<boolean> {
     const id = req.id;
     await this.usersService.updateUserEmail(id, email);
-    return;
+    return true;
   }
 
   @Patch('update-password')
@@ -74,7 +74,7 @@ export class UserController {
     const id = req.id;
     console.log('hasta aca llegue amiguito');
     await this.usersService.updateUserPass(id, password);
-    return;
+    return true;
   }
 
   @Patch('update-profile')

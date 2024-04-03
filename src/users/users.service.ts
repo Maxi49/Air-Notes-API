@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './userSchema/user-schema';
 import { Model } from 'mongoose';
@@ -56,15 +60,20 @@ export class UserService {
     return user;
   }
 
-  async updateUserEmail(userId: string, email: string): Promise<boolean> {
-    await this.firebaseAdminService.updateEmail(userId, email);
-    return true;
+  async updateUserEmail(userId: string, newEmail: any): Promise<boolean> {
+    try {
+      const { email } = newEmail;
+      await this.firebaseAdminService.updateEmail(userId, email);
+      return true;
+    } catch (error) {
+      throw new UnauthorizedException(error);
+    }
   }
 
-  async updateUserPass(userId: string, pass: string): Promise<boolean> {
+  async updateUserPass(userId: string, pass: any): Promise<boolean> {
     try {
-      console.log('pa loco la concha de tu madre :D');
-      await this.firebaseAdminService.updatePassword(userId, pass);
+      const { password } = pass;
+      await this.firebaseAdminService.updatePassword(userId, password);
       return true;
     } catch (error) {
       throw new BadRequestException(error);

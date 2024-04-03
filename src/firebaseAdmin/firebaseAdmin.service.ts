@@ -1,10 +1,15 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { Inject } from '@nestjs/common';
 import * as admin from 'firebase-admin';
+import { FirebaseConfig } from './Firebase.config';
 
 @Injectable()
 export class FirebaseAdminService {
-  constructor(@Inject('FIREBASE_ADMIN') private auth: admin.auth.Auth) {}
+  private auth: admin.auth.Auth;
+
+  constructor() {
+    FirebaseConfig.initializeFirebase();
+    this.auth = admin.auth();
+  }
 
   async updateEmail(uid: string, newEmail: string) {
     try {

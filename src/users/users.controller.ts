@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
@@ -28,9 +29,9 @@ export class UserController {
   }
 
   @Get('profile')
-  async getProfile() {
+  getProfile() {
     try {
-      return await this.usersService.getProfile();
+      return this.usersService.getProfile();
     } catch (error) {
       throw new BadRequestException(error);
     }
@@ -55,15 +56,24 @@ export class UserController {
 
   @Patch('update-email')
   @UseGuards(AuthGuard)
-  async updateUserEmail(@Body() email: string) {
-    await this.usersService.updateUserEmail(email);
+  async updateUserEmail(
+    @Body() email: string,
+    @Req() req: IRequest,
+  ): Promise<boolean> {
+    const id = req.id;
+    await this.usersService.updateUserEmail(id, email);
     return;
   }
 
   @Patch('update-password')
   @UseGuards(AuthGuard)
-  async updateUserPass(@Body() password: string) {
-    await this.usersService.updateUserEmail(password);
+  async updateUserPass(
+    @Body() password: string,
+    @Req() req: IRequest,
+  ): Promise<boolean> {
+    const id = req.id;
+    console.log('hasta aca llegue amiguito');
+    await this.usersService.updateUserPass(id, password);
     return;
   }
 
@@ -77,7 +87,7 @@ export class UserController {
 
   @Delete(':id')
   @UseGuards(AuthGuard)
-  async deleteUser(req: IRequest) {
+  async deleteUser(@Req() req: IRequest): Promise<void> {
     const id = req.id;
     await this.usersService.deleteUser(id);
     return;

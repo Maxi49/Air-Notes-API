@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { Provider } from '@nestjs/common';
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { FirebaseService } from './firebase.service';
+import { FirebaseAuthService } from './firebaseAuth.service';
 
 export const FIREBASE_AUTH_PROVIDER: Provider = {
   provide: 'FIREBASE_AUTH',
@@ -27,13 +27,13 @@ export const FIREBASE_AUTH_PROVIDER: Provider = {
 };
 
 @Module({
-  exports: [FIREBASE_AUTH_PROVIDER, FirebaseService],
-  providers: [FIREBASE_AUTH_PROVIDER, FirebaseService],
+  exports: [FIREBASE_AUTH_PROVIDER, FirebaseAuthService],
+  providers: [FIREBASE_AUTH_PROVIDER, FirebaseAuthService],
 })
-export class FirebaseModule {}
+export class FirebaseAuthModule {}
 
 /**
- * !TODO: SET FIREBASE AS A BACKEND SERVICE NOT ONLY AS A CLIENT PROVIDER
+ * !TODO: SET FIREBASE AS A BACKEND SERVICE
  *    credential: admin.credential.applicationDefault(),
       databaseURL:"https://air-notes-65be4-default-rtdb.firebaseio.com/",
  */

@@ -8,22 +8,24 @@ import {
   Auth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  updateEmail,
-  updatePassword,
 } from 'firebase/auth';
 
 @Injectable()
-export class FirebaseService {
+export class FirebaseAuthService {
   constructor(@Inject('FIREBASE_AUTH') private auth: Auth) {}
 
   async register(email: string, pass: string) {
-    const newUser = await createUserWithEmailAndPassword(
-      this.auth,
-      email,
-      pass,
-    );
+    try {
+      const newUser = await createUserWithEmailAndPassword(
+        this.auth,
+        email,
+        pass,
+      );
 
-    return newUser;
+      return newUser;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 
   async login(email: string, password: string) {
@@ -48,28 +50,6 @@ export class FirebaseService {
         throw new UnauthorizedException('No user is currently signed in');
       }
       return user;
-    } catch (err) {
-      throw new BadRequestException(err);
-    }
-  }
-
-  async updateEmail(newEmail: string) {
-    const user = this.auth.currentUser;
-    if (!user) throw new BadRequestException('No user is currently signed in');
-    try {
-      await updateEmail(user, newEmail);
-      return true;
-    } catch (err) {
-      throw new BadRequestException(err);
-    }
-  }
-
-  async updatePassword(newPass: string) {
-    const user = this.auth.currentUser;
-    if (!user) throw new BadRequestException('No user is currently signed in');
-    try {
-      await updatePassword(user, newPass);
-      return true;
     } catch (err) {
       throw new BadRequestException(err);
     }

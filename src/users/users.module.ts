@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { FirebaseModule } from 'src/firebase/firebase.module';
+import { FirebaseAuthModule } from 'src/firebaseAuth/firebaseAuth.module';
 import { NotesModule } from 'src/notes/notes.module';
 import { User, UserSchema } from './userSchema/user-schema';
 import { UserService } from './users.service';
 import { UserController } from './users.controller';
+import { FirebaseAdminModule } from 'src/firebaseAdmin/firebaseAdmin.module';
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { UserController } from './users.controller';
         schema: UserSchema,
       },
     ]),
-    FirebaseModule,
+    FirebaseAuthModule,
+    FirebaseAdminModule,
     NotesModule,
   ],
   exports: [UserService, MongooseModule],

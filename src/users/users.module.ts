@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { FirebaseAuthModule } from 'src/firebaseAuth/firebaseAuth.module';
 import { NotesModule } from 'src/notes/notes.module';
@@ -9,6 +9,7 @@ import { FirebaseAdminModule } from 'src/firebaseAdmin/firebaseAdmin.module';
 
 @Module({
   imports: [
+    forwardRef(() => NotesModule),
     MongooseModule.forFeature([
       {
         name: User.name,
@@ -17,7 +18,6 @@ import { FirebaseAdminModule } from 'src/firebaseAdmin/firebaseAdmin.module';
     ]),
     FirebaseAuthModule,
     FirebaseAdminModule,
-    NotesModule,
   ],
   exports: [UserService, MongooseModule],
   providers: [UserService],

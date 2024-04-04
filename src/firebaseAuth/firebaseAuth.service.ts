@@ -51,7 +51,7 @@ export class FirebaseAuthService {
 
   getProfile() {
     try {
-      const user = this.auth.currentUser;
+      const user = this.auth.currentUser.uid;
       if (!user) {
         throw new UnauthorizedException('No user is currently signed in');
       }

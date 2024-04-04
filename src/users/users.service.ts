@@ -24,11 +24,19 @@ export class UserService {
   }
 
   async findUserById(id: string) {
-    return await this.userModel.findById(id);
+    try {
+      const user = await this.userModel.findOne({
+        _id: id,
+      });
+      return user;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 
-  getProfile() {
-    return this.firebaseAuthService.getProfile();
+  async getProfile() {
+    const userId = this.firebaseAuthService.getProfile();
+    return await this.userModel.findOne({ _id: userId });
   }
 
   async register(user: CreateUserDto) {
@@ -50,6 +58,7 @@ export class UserService {
 
       return newUser;
     } catch (error) {
+      console.log(error);
       throw new BadRequestException(error);
     }
   }

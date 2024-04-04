@@ -17,13 +17,12 @@ export class FirebaseAdminService {
       return true;
     } catch (err) {
       console.error(err);
-      throw new BadRequestException('Failed to update email');
+      throw new BadRequestException('Failed to update email', err);
     }
   }
 
   async updatePassword(uid: string, newPass: string) {
     try {
-      console.log('Holis');
       await this.auth.updateUser(uid, { password: newPass });
       return true;
     } catch (err) {

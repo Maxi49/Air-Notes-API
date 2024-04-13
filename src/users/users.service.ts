@@ -42,6 +42,7 @@ export class UserService {
   async register(user: CreateUserDto) {
     try {
       const { age, email, lastname, location, name, password, username } = user;
+      console.log(location);
       const { user: userId } = await this.firebaseAuthService.register(
         email,
         password,

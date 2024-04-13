@@ -22,7 +22,7 @@ export class User {
   email: string;
 
   @Prop({
-    type: { type: String, enum: ['Point'], required: true },
+    type: { type: String, enum: ['Point'], required: false },
     coordinates: { type: [Number], required: true },
   })
   location: {

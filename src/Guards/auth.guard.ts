@@ -11,6 +11,9 @@ import { IRequest } from 'src/types/types';
 export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req: IRequest = context.switchToHttp().getRequest();
+    if (!req.headers.authorization) {
+      throw new UnauthorizedException('Not token provided');
+    }
     const token = req.headers.authorization.split(' ')[1];
     if (!token) {
       return false;

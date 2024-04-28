@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Note } from './noteSchema/note-schema';
 import { Model } from 'mongoose';
@@ -18,11 +22,19 @@ export class NotesService {
   }
 
   async findUserNotes(userId: string) {
-    return await this.noteModel.find({ user: userId });
+    try {
+      return await this.noteModel.find({ user: userId });
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 
   async findNoteById(id: string) {
-    return await this.noteModel.findById(id);
+    const note = await this.noteModel.findById(id);
+    if (!note) {
+      throw new NotFoundException();
+    }
+    return note;
   }
 
   async createNote(userId: string, note: CreateNoteDto) {
@@ -42,24 +54,32 @@ export class NotesService {
   }
 
   async removeNote(noteId: string, userId: string) {
-    return await this.noteModel.findByIdAndDelete({ _id: noteId, userId });
+    try {
+      return await this.noteModel.findByIdAndDelete({ _id: noteId, userId });
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 
   async findNotesNearUser(userId: string) {
-    const user = await this.userService.findUserById(userId);
-    const findedNote = await this.noteModel.find({
-      location: {
-        $near: {
-          $geometry: {
-            type: 'Point',
-            coordinates: user.location.coordinates,
+    try {
+      const user = await this.userService.findUserById(userId);
+      const findedNote = await this.noteModel.find({
+        location: {
+          $near: {
+            $geometry: {
+              type: 'Point',
+              coordinates: user.location.coordinates,
+            },
+            // Esta en metros je
+            $maxDistance: 30,
           },
-          // Esta en metros je
-          $maxDistance: 30,
         },
-      },
-    });
+      });
 
-    return findedNote;
+      return findedNote;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 }

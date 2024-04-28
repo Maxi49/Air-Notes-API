@@ -35,8 +35,12 @@ export class UserService {
   }
 
   async getProfile() {
-    const userId = this.firebaseAuthService.getProfile();
-    return await this.userModel.findOne({ _id: userId });
+    try {
+      const userId = this.firebaseAuthService.getProfile();
+      return await this.userModel.findOne({ _id: userId });
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 
   async register(user: CreateUserDto) {
@@ -55,6 +59,7 @@ export class UserService {
         lastname,
         age,
         location,
+        created: true,
       });
 
       return newUser;
@@ -66,7 +71,6 @@ export class UserService {
 
   async login(email: string, pass: string) {
     const user = await this.firebaseAuthService.login(email, pass);
-
     return user;
   }
 
@@ -83,6 +87,7 @@ export class UserService {
   async updateUserPass(userId: string, pass: any): Promise<boolean> {
     try {
       const { password } = pass;
+
       await this.firebaseAdminService.updatePassword(userId, password);
       return true;
     } catch (error) {
@@ -91,15 +96,23 @@ export class UserService {
   }
 
   async updateUserProfile(id: string, user: UpdateUserDto) {
-    return await this.userModel.findByIdAndUpdate(
-      id,
-      { ...user },
-      { new: true },
-    );
+    try {
+      return await this.userModel.findByIdAndUpdate(
+        id,
+        { ...user },
+        { new: true },
+      );
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 
   async deleteUser(id: string) {
-    await this.userModel.findByIdAndDelete(id);
-    return;
+    try {
+      await this.userModel.findByIdAndDelete(id);
+      return;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 }

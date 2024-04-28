@@ -26,6 +26,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
       statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,
+      cause: {
+        error: exception,
+      },
     });
   }
 }

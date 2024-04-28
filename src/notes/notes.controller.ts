@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -7,6 +8,7 @@ import {
   Patch,
   Post,
   Req,
+  Res,
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
@@ -16,6 +18,7 @@ import { AuthGuard } from 'src/Guards/auth.guard';
 import { CreateNoteDto } from './note-dto/create-note.dto';
 import { IRequest } from 'src/types/types';
 import { UpdateNoteDto } from './note-dto/update-note.dto';
+import { Response } from 'express';
 
 @Controller('notes')
 @UseFilters(new HttpExceptionFilter())
@@ -29,15 +32,21 @@ export class NotesController {
 
   @Get('user-notes')
   @UseGuards(AuthGuard)
-  async getUserNotes(@Req() req: IRequest) {
+  async getUserNotes(@Req() req: IRequest, @Res() res: Response) {
     const id = req.id;
-    return await this.notesService.findUserNotes(id);
+    return res.json({
+      userNotes: await this.notesService.findUserNotes(id),
+      success: true,
+    });
   }
 
   @Get('near-notes')
   @UseGuards(AuthGuard)
-  async getNotesNearUser(@Req() req: IRequest) {
-    return await this.notesService.findNotesNearUser(req.id);
+  async getNotesNearUser(@Req() req: IRequest, @Res() res: Response) {
+    return res.json({
+      nearNotes: await this.notesService.findNotesNearUser(req.id),
+      success: true,
+    });
   }
 
   @Get(':id')
@@ -47,9 +56,20 @@ export class NotesController {
 
   @Post('new-note')
   @UseGuards(AuthGuard)
-  async create(@Body() note: CreateNoteDto, @Req() req: IRequest) {
-    const id = req.id;
-    return await this.notesService.createNote(id, note);
+  async create(
+    @Body() note: CreateNoteDto,
+    @Req() req: IRequest,
+    @Res() res: Response,
+  ) {
+    try {
+      const id = req.id;
+      return res.json({
+        createdNote: await this.notesService.createNote(id, note),
+        success: true,
+      });
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 
   @Patch(':id')
@@ -59,20 +79,28 @@ export class NotesController {
     @Req() req: IRequest,
     @Body()
     note: UpdateNoteDto,
+    @Res() res: Response,
   ) {
-    const userId = req.id;
-    const updatedNote = await this.notesService.updateNote(
-      userId,
-      noteId,
-      note,
-    );
-    return updatedNote;
+    try {
+      const userId = req.id;
+      const updatedNote = await this.notesService.updateNote(
+        userId,
+        noteId,
+        note,
+      );
+      return res.json({
+        updatedNote: updatedNote,
+        success: true,
+      });
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 
   @Delete(':id')
   async remove(@Param('id') noteId: string, @Req() req: IRequest) {
     const userId = req.id;
     await this.notesService.removeNote(noteId, userId);
-    return;
+    return null;
   }
 }

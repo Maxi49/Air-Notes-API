@@ -30,4 +30,12 @@ export class FirebaseAdminService {
       throw new BadRequestException('Failed to update password');
     }
   }
+
+  async deleteUser(uid: string) {
+    try {
+      await this.auth.deleteUser(uid);
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
 }

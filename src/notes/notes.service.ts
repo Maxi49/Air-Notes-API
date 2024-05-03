@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -14,7 +16,7 @@ import { UserService } from 'src/users/users.service';
 export class NotesService {
   constructor(
     @InjectModel(Note.name) private noteModel: Model<Note>,
-    private userService: UserService,
+    @Inject(forwardRef(() => UserService)) private userService: UserService,
   ) {}
 
   async findAllNotes() {
@@ -61,6 +63,15 @@ export class NotesService {
     }
   }
 
+  async removeAllUserNotes(userId: string): Promise<boolean> {
+    try {
+      await this.noteModel.deleteMany({ user: userId });
+      return true;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
   async findNotesNearUser(userId: string) {
     try {
       const user = await this.userService.findUserById(userId);
@@ -71,8 +82,7 @@ export class NotesService {
               type: 'Point',
               coordinates: user.location.coordinates,
             },
-            // Esta en metros je
-            $maxDistance: 30,
+            $maxDistance: 10,
           },
         },
       });

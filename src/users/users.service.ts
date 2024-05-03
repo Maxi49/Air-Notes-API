@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -10,6 +12,7 @@ import { FirebaseAuthService } from 'src/firebaseAuth/firebaseAuth.service';
 import { UpdateUserDto } from './user-dto/update-user.dto';
 import { CreateUserDto } from './user-dto/create-user.dto';
 import { FirebaseAdminService } from 'src/firebaseAdmin/firebaseAdmin.service';
+import { NotesService } from 'src/notes/notes.service';
 
 @Injectable()
 export class UserService {
@@ -17,6 +20,7 @@ export class UserService {
     @InjectModel(User.name) private userModel: Model<User>,
     private firebaseAuthService: FirebaseAuthService,
     private firebaseAdminService: FirebaseAdminService,
+    @Inject(forwardRef(() => NotesService)) private noteService: NotesService,
   ) {}
 
   async findAllUsers() {
@@ -59,7 +63,6 @@ export class UserService {
         lastname,
         age,
         location,
-        created: true,
       });
 
       return newUser;
@@ -107,10 +110,14 @@ export class UserService {
     }
   }
 
-  async deleteUser(id: string) {
+  async deleteUser() {
     try {
-      await this.userModel.findByIdAndDelete(id);
-      return;
+      const userToDelete = this.firebaseAuthService.getProfile();
+      await this.firebaseAdminService.deleteUser(userToDelete);
+      await this.noteService.removeAllUserNotes(userToDelete);
+      await this.userModel.findByIdAndDelete(userToDelete);
+
+      return true;
     } catch (error) {
       throw new BadRequestException(error);
     }

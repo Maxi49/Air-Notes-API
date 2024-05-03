@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Req,
+  Res,
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
@@ -17,6 +18,7 @@ import { CreateUserDto } from './user-dto/create-user.dto';
 import { IRequest, UserCredentials } from 'src/types/types';
 import { AuthGuard } from 'src/Guards/auth.guard';
 import { HttpExceptionFilter } from 'src/ErrorHandlers/errorHandlers';
+import { Response } from 'express';
 
 @Controller('user-actions')
 @UseFilters(new HttpExceptionFilter())
@@ -44,8 +46,12 @@ export class UserController {
   }
 
   @Post('register')
-  async create(@Body() user: CreateUserDto): Promise<User> {
-    return this.usersService.register(user);
+  async create(@Body() user: CreateUserDto, @Res() res: Response) {
+    const createdUser = await this.usersService.register(user);
+    return res.json({
+      createdUser,
+      success: true,
+    });
   }
 
   @Post('login')
@@ -84,11 +90,10 @@ export class UserController {
     return updatedUser;
   }
 
-  @Delete(':id')
+  @Delete('delete-Profile')
   @UseGuards(AuthGuard)
-  async deleteUser(@Req() req: IRequest): Promise<void> {
-    const id = req.id;
-    await this.usersService.deleteUser(id);
+  async deleteUser(): Promise<void> {
+    await this.usersService.deleteUser();
     return;
   }
 }

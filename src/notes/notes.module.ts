@@ -6,7 +6,6 @@ import { NotesController } from './notes.controller';
 import { UsersModule } from 'src/users/users.module';
 
 @Module({
-  exports: [NotesService, MongooseModule],
   imports: [
     forwardRef(() => UsersModule),
     MongooseModule.forFeature([
@@ -16,6 +15,7 @@ import { UsersModule } from 'src/users/users.module';
       },
     ]),
   ],
+  exports: [NotesService, MongooseModule],
   providers: [NotesService],
   controllers: [NotesController],
 })

@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { NotesModule } from './notes/notes.module';
 import { UsersModule } from './users/users.module';
-import { GeoModule } from './geolocalization/geo.module';
 @Module({
   imports: [
     MongooseModule.forRoot(
@@ -10,7 +9,6 @@ import { GeoModule } from './geolocalization/geo.module';
     ),
     NotesModule,
     UsersModule,
-    GeoModule,
   ],
 })
 export class AppModule {}

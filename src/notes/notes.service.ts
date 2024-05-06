@@ -12,6 +12,8 @@ import { CreateNoteDto } from './note-dto/create-note.dto';
 import { UpdateNoteDto } from './note-dto/update-note.dto';
 import { UserService } from 'src/users/users.service';
 
+// TODO GLOBAL (MIDDLEWARE)
+// ! ADD A HANDLING ERROR MIDDLEWARE
 @Injectable()
 export class NotesService {
   constructor(

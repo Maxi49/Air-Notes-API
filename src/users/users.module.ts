@@ -19,7 +19,7 @@ import { FirebaseAdminModule } from 'src/firebaseAdmin/firebaseAdmin.module';
     FirebaseAuthModule,
     FirebaseAdminModule,
   ],
-  exports: [UserService, MongooseModule],
+  exports: [UserService],
   providers: [UserService],
   controllers: [UserController],
 })

@@ -18,7 +18,7 @@ import { UserService } from 'src/users/users.service';
 export class NotesService {
   constructor(
     @InjectModel(Note.name) private noteModel: Model<Note>,
-    @Inject(forwardRef(() => UserService)) private userService: UserService,
+    @Inject(forwardRef(() => UserService)) private readonly userService: UserService,
   ) {}
 
   async findAllNotes() {
@@ -74,10 +74,11 @@ export class NotesService {
     }
   }
 
-  async findNotesNearUser(userId: string) {
+  async findNotesNearUser(userId: string): Promise<any> {
     try {
       const user = await this.userService.findUserById(userId);
-      const findedNote = await this.noteModel.find({
+
+      const filter = {
         location: {
           $near: {
             $geometry: {
@@ -87,9 +88,12 @@ export class NotesService {
             $maxDistance: 10,
           },
         },
-      });
+      }
+      const notes = await this.noteModel.find(filter);
 
-      return findedNote;
+      const total = await this.noteModel.countDocuments(filter)
+
+      return {list: notes, total}; // {item: note}
     } catch (error) {
       throw new BadRequestException(error);
     }

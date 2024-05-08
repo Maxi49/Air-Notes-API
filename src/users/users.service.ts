@@ -27,12 +27,14 @@ export class UserService {
     return await this.userModel.find({});
   }
 
-  async findUserById(id: string) {
+  async findUserById(id: string) : Promise<User>{
     try {
       const user = await this.userModel.findOne({
         _id: id,
       });
+
       return user;
+      
     } catch (error) {
       throw new BadRequestException(error);
     }

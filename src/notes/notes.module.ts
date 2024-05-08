@@ -15,7 +15,7 @@ import { UsersModule } from 'src/users/users.module';
       },
     ]),
   ],
-  exports: [NotesService, MongooseModule],
+  exports: [NotesService],
   providers: [NotesService],
   controllers: [NotesController],
 })

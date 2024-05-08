@@ -10,7 +10,7 @@ import {
   Req,
   Res,
   UseFilters,
-  UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
 import { UserService } from './users.service';
 import { User } from './userSchema/user-schema';
@@ -19,6 +19,8 @@ import { IRequest, UserCredentials } from 'src/types/types';
 import { AuthGuard } from 'src/Guards/auth.guard';
 import { HttpExceptionFilter } from 'src/ErrorHandlers/errorHandlers';
 import { Response } from 'express';
+import { UseGuards } from '@nestjs/common/decorators/core/use-guards.decorator';
+import { UsePipes } from '@nestjs/common/decorators/core/use-pipes.decorator';
 
 @Controller('user-actions')
 @UseFilters(new HttpExceptionFilter())

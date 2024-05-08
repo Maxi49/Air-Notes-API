@@ -14,7 +14,6 @@ export class AuthGuard implements CanActivate {
     if (!req.headers.authorization) {
       throw new UnauthorizedException('Not token provided');
     }
-
     const token = req.headers.authorization.split(' ')[1];
     if (!token) {
       return false;

@@ -22,6 +22,7 @@ export class AuthGuard implements CanActivate {
     try {
       const decodedToken = await admin.auth().verifyIdToken(token);
       console.log('Token', decodedToken);
+      // buscarlo en la db por el uuid
       req.user = decodedToken;
       req.id = decodedToken.uid;
       return true; // Siempre devolver true en un Guard

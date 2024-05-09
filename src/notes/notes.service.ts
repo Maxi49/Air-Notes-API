@@ -18,7 +18,8 @@ import { UserService } from 'src/users/users.service';
 export class NotesService {
   constructor(
     @InjectModel(Note.name) private noteModel: Model<Note>,
-    @Inject(forwardRef(() => UserService)) private readonly userService: UserService,
+    @Inject(forwardRef(() => UserService))
+    private readonly userService: UserService,
   ) {}
 
   async findAllNotes() {
@@ -88,12 +89,12 @@ export class NotesService {
             $maxDistance: 10,
           },
         },
-      }
+      };
       const notes = await this.noteModel.find(filter);
 
-      const total = await this.noteModel.countDocuments(filter)
+      const total = await this.noteModel.countDocuments(filter);
 
-      return {list: notes, total}; // {item: note}
+      return { list: notes, total }; // {item: note}
     } catch (error) {
       throw new BadRequestException(error);
     }

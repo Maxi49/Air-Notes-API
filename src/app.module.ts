@@ -2,6 +2,9 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { NotesModule } from './notes/notes.module';
 import { UsersModule } from './users/users.module';
+import { AuthGuardModule } from './Guards/auth.guard.module';
+import { FirebaseAuthModule } from './firebaseAuth/firebaseAuth.module';
+import { FirebaseAdminModule } from './firebaseAdmin/firebaseAdmin.module';
 @Module({
   imports: [
     MongooseModule.forRoot(
@@ -9,6 +12,9 @@ import { UsersModule } from './users/users.module';
     ),
     NotesModule,
     UsersModule,
+    AuthGuardModule,
+    FirebaseAuthModule,
+    FirebaseAdminModule,
   ],
 })
 export class AppModule {}

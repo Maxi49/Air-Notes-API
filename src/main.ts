@@ -10,6 +10,6 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors();
-  await app.listen(process.env.PORT || 3000);
+  await app.listen(10000);
 }
 bootstrap();

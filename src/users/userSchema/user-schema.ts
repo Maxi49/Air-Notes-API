@@ -2,9 +2,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 @Schema({ timestamps: true })
 export class User {
-  @Prop({ required: true })
-  _id: string;
-
   @Prop({ required: true, unique: true })
   username: string;
 
@@ -12,10 +9,10 @@ export class User {
   name: string;
 
   @Prop({ required: true })
-  age: number;
+  firebaseUID: string;
 
   @Prop({ required: true })
-  lastname: string;
+  age: number;
 
   @Prop({ required: true, unique: true })
   email: string;

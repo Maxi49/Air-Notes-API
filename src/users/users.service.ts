@@ -13,6 +13,7 @@ import { UpdateUserDto } from './user-dto/update-user.dto';
 import { CreateUserDto } from './user-dto/create-user.dto';
 import { FirebaseAdminService } from 'src/firebaseAdmin/firebaseAdmin.service';
 import { NotesService } from 'src/notes/notes.service';
+import { UserDto } from './user-dto/user.dto';
 
 @Injectable()
 export class UserService {
@@ -24,12 +25,30 @@ export class UserService {
   ) {}
 
   async findAllUsers() {
-    return await this.userModel.find({});
+    try {
+      const users = await this.userModel.find({});
+      const total = await this.userModel.countDocuments({});
+      return { users, total };
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 
-  async findUserById(id: string): Promise<User> {
+  async findUserByFirebaseId(id: string) {
     try {
       const user = await this.userModel.findOne({
+        firebaseUID: id,
+      });
+
+      return user;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  async findUserById(id: string) {
+    try {
+      const user = await this.userModel.findById({
         _id: id,
       });
 
@@ -39,29 +58,18 @@ export class UserService {
     }
   }
 
-  async getProfile() {
-    try {
-      const userId = this.firebaseAuthService.getProfile();
-      return await this.userModel.findOne({ _id: userId });
-    } catch (error) {
-      throw new BadRequestException(error);
-    }
-  }
-
   async register(user: CreateUserDto) {
     try {
-      const { age, email, lastname, location, name, password, username } = user;
-      console.log(location);
-      const { user: userId } = await this.firebaseAuthService.register(
+      const { age, email, location, name, password, username } = user;
+      const { user: userID } = await this.firebaseAuthService.register(
         email,
         password,
       );
       const newUser = await this.userModel.create({
-        _id: userId.uid,
         email,
         username,
         name,
-        lastname,
+        firebaseUID: userID.uid,
         age,
         location,
       });
@@ -78,7 +86,7 @@ export class UserService {
     return user;
   }
 
-  async updateUserEmail(userId: string, newEmail: any): Promise<boolean> {
+  async updateUserEmail(userId: string, newEmail: User) {
     try {
       const { email } = newEmail;
       await this.firebaseAdminService.updateEmail(userId, email);
@@ -88,7 +96,7 @@ export class UserService {
     }
   }
 
-  async updateUserPass(userId: string, pass: any): Promise<boolean> {
+  async updateUserPass(userId: string, pass: any) {
     try {
       const { password } = pass;
 
@@ -111,12 +119,12 @@ export class UserService {
     }
   }
 
-  async deleteUser() {
+  async deleteUser(user: UserDto) {
     try {
-      const userToDelete = this.firebaseAuthService.getProfile();
-      await this.firebaseAdminService.deleteUser(userToDelete);
-      await this.noteService.removeAllUserNotes(userToDelete);
-      await this.userModel.findByIdAndDelete(userToDelete);
+      const { _id } = user;
+      await this.firebaseAdminService.deleteUser(_id);
+      await this.noteService.removeAllUserNotes(_id);
+      await this.userModel.findByIdAndDelete(_id);
 
       return true;
     } catch (error) {

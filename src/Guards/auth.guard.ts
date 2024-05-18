@@ -5,10 +5,17 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import * as admin from 'firebase-admin';
+import { NotesService } from 'src/notes/notes.service';
 import { IRequest } from 'src/types/types';
+import { UserService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+  constructor(
+    private userService: UserService,
+    private notesService: NotesService,
+  ) {}
+
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req: IRequest = context.switchToHttp().getRequest();
     if (!req.headers.authorization) {
@@ -21,11 +28,13 @@ export class AuthGuard implements CanActivate {
 
     try {
       const decodedToken = await admin.auth().verifyIdToken(token);
-      console.log('Token', decodedToken);
-      // buscarlo en la db por el uuid
-      req.user = decodedToken;
-      req.id = decodedToken.uid;
-      return true; // Siempre devolver true en un Guard
+      const user = await this.userService.findUserByFirebaseId(
+        decodedToken.uid,
+      );
+      const notes = await this.notesService.findUserNotes(user._id);
+      const profile = { user, notes };
+      req.user = profile;
+      return true;
     } catch (error) {
       console.log(error);
       throw new UnauthorizedException(error);

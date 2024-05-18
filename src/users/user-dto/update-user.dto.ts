@@ -13,10 +13,6 @@ export class UpdateUserDto {
   @IsOptional()
   age?: number;
 
-  @IsString()
-  @IsOptional()
-  lastname?: string;
-
   @IsEmail()
   @IsOptional()
   email?: string;

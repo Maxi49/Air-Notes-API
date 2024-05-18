@@ -12,8 +12,6 @@ import { CreateNoteDto } from './note-dto/create-note.dto';
 import { UpdateNoteDto } from './note-dto/update-note.dto';
 import { UserService } from 'src/users/users.service';
 
-// TODO GLOBAL (MIDDLEWARE)
-// ! ADD A HANDLING ERROR MIDDLEWARE
 @Injectable()
 export class NotesService {
   constructor(
@@ -23,10 +21,12 @@ export class NotesService {
   ) {}
 
   async findAllNotes() {
-    return await this.noteModel.find({});
+    const notes = await this.noteModel.find({});
+    const total = await this.noteModel.countDocuments({});
+    return { notes, total };
   }
 
-  async findUserNotes(userId: string) {
+  async findUserNotes(userId) {
     try {
       return await this.noteModel.find({ user: userId });
     } catch (error) {
@@ -66,7 +66,7 @@ export class NotesService {
     }
   }
 
-  async removeAllUserNotes(userId: string): Promise<boolean> {
+  async removeAllUserNotes(userId: string) {
     try {
       await this.noteModel.deleteMany({ user: userId });
       return true;
@@ -75,7 +75,7 @@ export class NotesService {
     }
   }
 
-  async findNotesNearUser(userId: string): Promise<any> {
+  async findNotesNearUser(userId: string) {
     try {
       const user = await this.userService.findUserById(userId);
 
@@ -94,7 +94,7 @@ export class NotesService {
 
       const total = await this.noteModel.countDocuments(filter);
 
-      return { list: notes, total }; // {item: note}
+      return { notes, total }; // {item: note}
     } catch (error) {
       throw new BadRequestException(error);
     }

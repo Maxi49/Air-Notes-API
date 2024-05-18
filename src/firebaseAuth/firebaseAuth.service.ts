@@ -42,23 +42,11 @@ export class FirebaseAuthService {
         email,
         password,
       );
-
+      console.log(userCredentials);
       const user = userCredentials.user;
       return user;
     } catch (err) {
       throw new UnauthorizedException('Error at trying to login', err);
-    }
-  }
-
-  getProfile() {
-    try {
-      const user = this.auth.currentUser.uid;
-      if (!user) {
-        throw new UnauthorizedException('No user is currently signed in');
-      }
-      return user;
-    } catch (err) {
-      throw new BadRequestException(err);
     }
   }
 }

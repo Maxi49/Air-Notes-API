@@ -19,10 +19,6 @@ export class CreateUserDto {
   @IsNotEmpty()
   age: number;
 
-  @IsString()
-  @IsNotEmpty()
-  lastname: string;
-
   @IsEmail()
   @IsNotEmpty()
   email: string;

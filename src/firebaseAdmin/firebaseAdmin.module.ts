@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { FirebaseAdminService } from './firebaseAdmin.service';
 
 @Module({
-  exports: [FirebaseAdminService],
   providers: [FirebaseAdminService],
+  exports: [FirebaseAdminService],
 })
 export class FirebaseAdminModule {}

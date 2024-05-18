@@ -7,8 +7,6 @@ import {
   Param,
   Patch,
   Post,
-  Req,
-  Res,
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
@@ -16,9 +14,9 @@ import { NotesService } from './notes.service';
 import { HttpExceptionFilter } from 'src/ErrorHandlers/errorHandlers';
 import { AuthGuard } from 'src/Guards/auth.guard';
 import { CreateNoteDto } from './note-dto/create-note.dto';
-import { IRequest } from 'src/types/types';
 import { UpdateNoteDto } from './note-dto/update-note.dto';
-import { Response } from 'express';
+import { CurrentUser } from 'src/CustomDecorators/getCurrentUser';
+import { UserDto } from 'src/users/user-dto/user.dto';
 
 @Controller('notes')
 @UseFilters(new HttpExceptionFilter())
@@ -32,21 +30,15 @@ export class NotesController {
 
   @Get('user-notes')
   @UseGuards(AuthGuard)
-  async getUserNotes(@Req() req: IRequest, @Res() res: Response) {
-    const id = req.id;
-    return res.json({
-      userNotes: await this.notesService.findUserNotes(id),
-      success: true,
-    });
+  async getUserNotes(@CurrentUser() user: UserDto) {
+    const id = user._id;
+    return await this.notesService.findUserNotes(id);
   }
 
   @Get('near-notes')
   @UseGuards(AuthGuard)
-  async getNotesNearUser(@Req() req: IRequest, @Res() res: Response) {
-    return res.json({
-      nearNotes: await this.notesService.findNotesNearUser(req.id),
-      success: true,
-    });
+  async getNotesNearUser(@CurrentUser() user: UserDto) {
+    return await this.notesService.findNotesNearUser(user._id);
   }
 
   @Get(':id')
@@ -56,17 +48,10 @@ export class NotesController {
 
   @Post('new-note')
   @UseGuards(AuthGuard)
-  async create(
-    @Body() note: CreateNoteDto,
-    @Req() req: IRequest,
-    @Res() res: Response,
-  ) {
+  async create(@Body() note: CreateNoteDto, @CurrentUser() user: UserDto) {
     try {
-      const id = req.id;
-      return res.json({
-        createdNote: await this.notesService.createNote(id, note),
-        success: true,
-      });
+      const id = user._id;
+      return await this.notesService.createNote(id, note);
     } catch (error) {
       throw new BadRequestException(error);
     }
@@ -75,32 +60,26 @@ export class NotesController {
   @Patch(':id')
   @UseGuards(AuthGuard)
   async update(
+    @CurrentUser() user: UserDto,
     @Param('id') noteId: string,
-    @Req() req: IRequest,
     @Body()
     note: UpdateNoteDto,
-    @Res() res: Response,
   ) {
     try {
-      const userId = req.id;
       const updatedNote = await this.notesService.updateNote(
-        userId,
+        user._id,
         noteId,
         note,
       );
-      return res.json({
-        updatedNote: updatedNote,
-        success: true,
-      });
+      return updatedNote;
     } catch (error) {
       throw new BadRequestException(error);
     }
   }
 
   @Delete(':id')
-  async remove(@Param('id') noteId: string, @Req() req: IRequest) {
-    const userId = req.id;
-    await this.notesService.removeNote(noteId, userId);
+  async remove(@Param('id') noteId: string, @CurrentUser() user: UserDto) {
+    await this.notesService.removeNote(noteId, user._id);
     return null;
   }
 }

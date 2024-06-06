@@ -11,8 +11,6 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors();
-  console.log(process.env);
-  console.log(process.env.PORT);
-  await app.listen(process.env.PORT || 10000);
+  await app.listen(80);
 }
 bootstrap();

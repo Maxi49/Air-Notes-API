@@ -9,3 +9,5 @@ export interface UserCredentials {
   email: string;
   password: string;
 }
+
+export type Scope = 'global' | 'local';

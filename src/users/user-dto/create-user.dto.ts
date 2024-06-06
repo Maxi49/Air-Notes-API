@@ -1,10 +1,4 @@
-import {
-  IsNotEmpty,
-  IsString,
-  IsInt,
-  IsEmail,
-  IsOptional,
-} from 'class-validator';
+import { IsNotEmpty, IsString, IsInt, IsEmail } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -24,7 +18,7 @@ export class CreateUserDto {
   email: string;
 
   @IsString()
-  @IsOptional()
+  @IsNotEmpty()
   password: string;
 
   @IsNotEmpty()
@@ -32,4 +26,8 @@ export class CreateUserDto {
     type: string;
     coordinates: number[];
   };
+
+  @IsString()
+  @IsNotEmpty()
+  profilePicture: string;
 }

@@ -26,4 +26,8 @@ export class UpdateUserDto {
     type: string;
     coordinates: number[];
   };
+
+  @IsString()
+  @IsOptional()
+  profilePicture: string;
 }

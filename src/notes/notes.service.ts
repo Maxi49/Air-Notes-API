@@ -43,16 +43,25 @@ export class NotesService {
   }
 
   async createNote(userId: string, note: CreateNoteDto) {
+    const { description, location, title, country, image, likes, scope, user } =
+      note;
     console.log('userId provided: ', userId);
-    return await this.noteModel.create({ user: userId, ...note });
+    return await this.noteModel.create({
+      user: user,
+      title,
+      country,
+      description,
+      image,
+      likes,
+      location,
+      scope,
+    });
   }
 
   async updateNote(userId: string, id: string, note: UpdateNoteDto) {
-    const { description, location, title, user } = note;
-
     const updatedNote = await this.noteModel.findByIdAndUpdate(
       { _id: id, userId },
-      { description, location, title, user },
+      { ...note },
       { new: true },
     );
     return updatedNote;
@@ -99,4 +108,6 @@ export class NotesService {
       throw new BadRequestException(error);
     }
   }
+
+  //recuperar la nota y hacer update del like
 }

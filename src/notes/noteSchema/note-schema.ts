@@ -1,3 +1,4 @@
+import { Scope } from '@nestjs/common';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { User } from 'src/users/userSchema/user-schema';
 
@@ -20,6 +21,20 @@ export class Note {
     type: string;
     coordinates: number[];
   };
+
+  @Prop({ required: true })
+  likes: number;
+
+  @Prop({ required: true })
+  image: string;
+
+  @Prop({ required: true })
+  country: string;
+
+  //TODO add "completed" prop and set it as boolean
+
+  @Prop({ required: true, type: String })
+  scope: Scope;
 }
 
 export const NoteSchema = SchemaFactory.createForClass(Note);

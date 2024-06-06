@@ -45,7 +45,6 @@ export class UserService {
       throw new BadRequestException(error);
     }
   }
-
   async findUserById(id: string) {
     try {
       const user = await this.userModel.findById({
@@ -60,12 +59,14 @@ export class UserService {
 
   async register(user: CreateUserDto) {
     try {
-      const { age, email, location, name, password, username } = user;
+      const { age, email, location, name, password, username, profilePicture } =
+        user;
       const { user: userID } = await this.firebaseAuthService.register(
         email,
         password,
       );
       const newUser = await this.userModel.create({
+        profilePicture,
         email,
         username,
         name,

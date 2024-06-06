@@ -66,7 +66,10 @@ export class UserController {
 
   @Patch('update-password')
   @UseGuards(AuthGuard)
-  async updateUserPass(@Body() password: string, @CurrentUser() user: UserDto) {
+  async updateUserPass(
+    @Body() password: string,
+    @CurrentUser() user: UserDto,
+  ): Promise<boolean> {
     await this.usersService.updateUserPass(user._id, password);
     return true;
   }

@@ -32,8 +32,9 @@ export class AuthGuard implements CanActivate {
         decodedToken.uid,
       );
       const notes = await this.notesService.findUserNotes(user._id);
-      const profile = { user, notes };
+      const profile = user;
       req.user = profile;
+      req.notes = notes;
       return true;
     } catch (error) {
       console.log(error);

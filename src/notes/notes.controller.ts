@@ -38,7 +38,9 @@ export class NotesController {
   @Get('near-notes')
   @UseGuards(AuthGuard)
   async getNotesNearUser(@CurrentUser() user: UserDto) {
-    return await this.notesService.findNotesNearUser(user._id);
+    const notes = await this.notesService.findNotesNearUser(user._id);
+    console.log(notes);
+    return notes;
   }
 
   @Get(':id')
@@ -48,7 +50,7 @@ export class NotesController {
 
   @Post('new-note')
   @UseGuards(AuthGuard)
-  async create(@Body() note: CreateNoteDto, @CurrentUser() user: UserDto) {
+  async create(@Body() note: CreateNoteDto, @CurrentUser() user: any) {
     try {
       const id = user._id;
       return await this.notesService.createNote(id, note);

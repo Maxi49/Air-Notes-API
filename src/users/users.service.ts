@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './userSchema/user-schema';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { FirebaseAuthService } from 'src/firebaseAuth/firebaseAuth.service';
 import { UpdateUserDto } from './user-dto/update-user.dto';
 import { CreateUserDto } from './user-dto/create-user.dto';
@@ -108,7 +108,7 @@ export class UserService {
     }
   }
 
-  async updateUserProfile(id: string, user: UpdateUserDto) {
+  async updateUserProfile(id: string, user: UpdateUserDto): Promise<User> {
     try {
       return await this.userModel.findByIdAndUpdate(
         id,
@@ -118,6 +118,18 @@ export class UserService {
     } catch (error) {
       throw new BadRequestException(error);
     }
+  }
+
+  async updateUserLikedNotes(id: string, like: mongoose.Types.ObjectId) {
+    const updatedLikes = await this.userModel.findByIdAndUpdate(
+      id,
+      {
+        $push: { likes: like },
+      },
+      { new: true },
+    );
+
+    return updatedLikes;
   }
 
   async deleteUser(user: UserDto) {

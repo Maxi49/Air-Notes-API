@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Note } from './noteSchema/note-schema';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { CreateNoteDto } from './note-dto/create-note.dto';
 import { UpdateNoteDto } from './note-dto/update-note.dto';
 import { UserService } from 'src/users/users.service';
@@ -43,16 +43,15 @@ export class NotesService {
   }
 
   async createNote(userId: string, note: CreateNoteDto) {
-    const { description, location, title, country, image, likes, scope, user } =
-      note;
+    const { description, location, title, country, image, scope } = note;
+
     console.log('userId provided: ', userId);
     return await this.noteModel.create({
-      user: user,
+      user: userId,
       title,
       country,
       description,
       image,
-      likes,
       location,
       scope,
     });
@@ -60,7 +59,7 @@ export class NotesService {
 
   async updateNote(userId: string, id: string, note: UpdateNoteDto) {
     const updatedNote = await this.noteModel.findByIdAndUpdate(
-      { _id: id, userId },
+      { _id: id, user: userId },
       { ...note },
       { new: true },
     );
@@ -75,6 +74,18 @@ export class NotesService {
     }
   }
 
+  async updateNoteLikes(id: string, like: mongoose.Types.ObjectId) {
+    const updatedLikes = await this.noteModel.findByIdAndUpdate(
+      id,
+      {
+        $push: { likes: like },
+      },
+      { new: true },
+    );
+
+    return updatedLikes;
+  }
+
   async removeAllUserNotes(userId: string) {
     try {
       await this.noteModel.deleteMany({ user: userId });
@@ -83,7 +94,6 @@ export class NotesService {
       throw new BadRequestException(error);
     }
   }
-
   async findNotesNearUser(userId: string) {
     try {
       const user = await this.userService.findUserById(userId);
@@ -95,19 +105,14 @@ export class NotesService {
               type: 'Point',
               coordinates: user.location.coordinates,
             },
-            $maxDistance: 10,
+            $maxDistance: 50,
           },
         },
       };
       const notes = await this.noteModel.find(filter);
-
-      const total = await this.noteModel.countDocuments(filter);
-
-      return { notes, total }; // {item: note}
+      return notes; // {item: note}
     } catch (error) {
       throw new BadRequestException(error);
     }
   }
-
-  //recuperar la nota y hacer update del like
 }

@@ -1,11 +1,11 @@
 import { Scope } from '@nestjs/common';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { User } from 'src/users/userSchema/user-schema';
+import mongoose from 'mongoose';
 
 @Schema()
 export class Note {
-  @Prop({ type: String, ref: 'user' })
-  user: User;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
+  user: string;
 
   @Prop({ required: true })
   title: string;
@@ -23,7 +23,7 @@ export class Note {
   };
 
   @Prop({ required: true })
-  likes: number;
+  likes: [{ type: mongoose.Schema.Types.ObjectId; ref: 'Like' }];
 
   @Prop({ required: true })
   image: string;

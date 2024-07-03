@@ -18,6 +18,7 @@ import { HttpExceptionFilter } from 'src/ErrorHandlers/errorHandlers';
 import { UseGuards } from '@nestjs/common/decorators/core/use-guards.decorator';
 import { CurrentUser } from 'src/CustomDecorators/getCurrentUser';
 import { UserDto } from './user-dto/user.dto';
+import { UpdateUserDto } from './user-dto/update-user.dto';
 
 @Controller('user-actions')
 @UseFilters(new HttpExceptionFilter())
@@ -77,7 +78,7 @@ export class UserController {
   @Patch('update-profile')
   @UseGuards(AuthGuard)
   async updateUserProfile(
-    @Body() updatedCharacteristics: User,
+    @Body() updatedCharacteristics: UpdateUserDto,
     @CurrentUser() user: UserDto,
   ): Promise<User> {
     const updatedUser = await this.usersService.updateUserProfile(

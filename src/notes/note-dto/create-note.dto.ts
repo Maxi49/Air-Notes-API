@@ -1,11 +1,7 @@
 import { Scope } from '@nestjs/common';
-import { IsNotEmpty, IsString, IsMongoId, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateNoteDto {
-  @IsMongoId()
-  @IsNotEmpty()
-  user: string;
-
   @IsString()
   @IsNotEmpty()
   title: string;
@@ -19,10 +15,6 @@ export class CreateNoteDto {
     type: string;
     coordinates: number[];
   };
-
-  @IsNumber()
-  @IsNotEmpty()
-  likes: number;
 
   @IsString()
   @IsNotEmpty()

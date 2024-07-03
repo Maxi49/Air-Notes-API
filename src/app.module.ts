@@ -4,6 +4,7 @@ import { NotesModule } from './notes/notes.module';
 import { UsersModule } from './users/users.module';
 import { FirebaseAuthModule } from './firebaseAuth/firebaseAuth.module';
 import { FirebaseAdminModule } from './firebaseAdmin/firebaseAdmin.module';
+import { LikesModule } from './likes/like.module';
 @Module({
   imports: [
     MongooseModule.forRoot(
@@ -13,6 +14,7 @@ import { FirebaseAdminModule } from './firebaseAdmin/firebaseAdmin.module';
     UsersModule,
     FirebaseAuthModule,
     FirebaseAdminModule,
+    LikesModule,
   ],
 })
 export class AppModule {}

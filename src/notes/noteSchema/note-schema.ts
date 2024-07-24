@@ -23,15 +23,12 @@ export class Note {
   };
 
   @Prop({ required: true })
-  likes: [{ type: mongoose.Schema.Types.ObjectId; ref: 'Like' }];
-
-  @Prop({ required: true })
   image: string;
 
   @Prop({ required: true })
   country: string;
 
-  //TODO add "completed" prop and set it as boolean
+  // TODO add "completed" prop and set it as boolean
 
   @Prop({ required: true, type: String })
   scope: Scope;

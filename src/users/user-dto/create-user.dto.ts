@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsInt, IsEmail, IsArray } from 'class-validator';
+import { IsNotEmpty, IsString, IsInt, IsEmail } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -20,10 +20,6 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   password: string;
-
-  @IsArray()
-  @IsNotEmpty()
-  likes: Array<unknown>;
 
   @IsNotEmpty()
   location: {

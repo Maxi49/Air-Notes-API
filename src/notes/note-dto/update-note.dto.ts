@@ -1,6 +1,5 @@
 import { Scope } from '@nestjs/common';
-import { IsOptional, IsString, IsMongoId, IsArray } from 'class-validator';
-import mongoose from 'mongoose';
+import { IsOptional, IsString, IsMongoId } from 'class-validator';
 
 export class UpdateNoteDto {
   @IsMongoId()
@@ -20,10 +19,6 @@ export class UpdateNoteDto {
     type: string;
     coordinates: number[];
   };
-
-  @IsArray()
-  @IsOptional()
-  likes: Array<mongoose.Types.ObjectId>;
 
   @IsString()
   @IsOptional()

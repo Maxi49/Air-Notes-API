@@ -7,10 +7,11 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Note } from './noteSchema/note-schema';
-import mongoose, { Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { CreateNoteDto } from './note-dto/create-note.dto';
 import { UpdateNoteDto } from './note-dto/update-note.dto';
 import { UserService } from 'src/users/users.service';
+import { MlApiService } from 'machineLearningApi/mlApi.service';
 
 @Injectable()
 export class NotesService {
@@ -18,6 +19,7 @@ export class NotesService {
     @InjectModel(Note.name) private noteModel: Model<Note>,
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
+    private readonly mlApiService: MlApiService,
   ) {}
 
   async findAllNotes() {
@@ -26,7 +28,7 @@ export class NotesService {
     return { notes, total };
   }
 
-  async findUserNotes(userId) {
+  async findUserNotes(userId: any) {
     try {
       return await this.noteModel.find({ user: userId });
     } catch (error) {
@@ -44,8 +46,11 @@ export class NotesService {
 
   async createNote(userId: string, note: CreateNoteDto) {
     const { description, location, title, country, image, scope } = note;
-
     console.log('userId provided: ', userId);
+    const classifiedText = await this.mlApiService.getTextClasses(description);
+
+    console.log(classifiedText);
+
     return await this.noteModel.create({
       user: userId,
       title,
@@ -73,19 +78,6 @@ export class NotesService {
       throw new BadRequestException(error);
     }
   }
-
-  async updateNoteLikes(id: string, like: mongoose.Types.ObjectId) {
-    const updatedLikes = await this.noteModel.findByIdAndUpdate(
-      id,
-      {
-        $push: { likes: like },
-      },
-      { new: true },
-    );
-
-    return updatedLikes;
-  }
-
   async removeAllUserNotes(userId: string) {
     try {
       await this.noteModel.deleteMany({ user: userId });

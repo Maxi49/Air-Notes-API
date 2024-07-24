@@ -1,5 +1,4 @@
-import { IsOptional, IsString, IsInt, IsEmail, IsArray } from 'class-validator';
-import mongoose from 'mongoose';
+import { IsOptional, IsString, IsInt, IsEmail } from 'class-validator';
 
 export class UpdateUserDto {
   @IsString()
@@ -21,10 +20,6 @@ export class UpdateUserDto {
   @IsString()
   @IsOptional()
   password?: string;
-
-  @IsArray()
-  @IsOptional()
-  likes: Array<mongoose.Types.ObjectId>;
 
   @IsOptional()
   location?: {

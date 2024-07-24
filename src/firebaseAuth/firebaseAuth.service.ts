@@ -30,7 +30,6 @@ export class FirebaseAuthService {
 
       return newUser;
     } catch (error) {
-      console.log('Holis');
       throw new BadRequestException(error);
     }
   }

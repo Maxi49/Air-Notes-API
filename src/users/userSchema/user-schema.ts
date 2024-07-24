@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose from 'mongoose';
 
 @Schema({ timestamps: true })
 export class User {
@@ -17,9 +16,6 @@ export class User {
 
   @Prop({ required: true, unique: true })
   email: string;
-
-  @Prop({ required: true })
-  likes: [{ type: mongoose.Schema.Types.ObjectId; ref: 'Like' }];
 
   @Prop({
     type: { type: String, enum: ['Point'], required: true },

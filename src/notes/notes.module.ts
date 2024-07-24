@@ -4,9 +4,11 @@ import { Note, NoteSchema } from './noteSchema/note-schema';
 import { NotesService } from './notes.service';
 import { NotesController } from './notes.controller';
 import { UsersModule } from 'src/users/users.module';
+import { MlApiModule } from 'machineLearningApi/mlApi.module';
 
 @Module({
   imports: [
+    MlApiModule,
     forwardRef(() => UsersModule),
     MongooseModule.forFeature([
       {

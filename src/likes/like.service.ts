@@ -20,11 +20,33 @@ export class LikeService {
     private readonly noteService: NotesService,
   ) {}
 
-  async addLike(userId: string, noteId: string) {
+  async getLikes(userId: string, noteId: string): Promise<Like[] | unknown[]> {
     try {
-      const like = await this.likeModel.create({ note: noteId, user: userId });
-      await this.userService.updateUserLikedNotes(userId, like._id);
-      await this.noteService.updateNoteLikes(noteId, like._id);
+      const like = await this.likeModel.find({ note: noteId, user: userId });
+      return like;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  async addLike(userId: string, noteId: string): Promise<boolean> {
+    try {
+      const likeExists = await this.getLikes(userId, noteId);
+      if (likeExists.length !== 0) return false;
+      await this.likeModel.create({ user: userId, note: noteId });
+
+      return true;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  async removeLike(userId: string, noteId: string): Promise<boolean> {
+    try {
+      await this.likeModel.findOneAndDelete({
+        note: noteId,
+        user: userId,
+      });
 
       return true;
     } catch (error) {

@@ -5,12 +5,14 @@ import { UsersModule } from './users/users.module';
 import { FirebaseAuthModule } from './firebaseAuth/firebaseAuth.module';
 import { FirebaseAdminModule } from './firebaseAdmin/firebaseAdmin.module';
 import { LikesModule } from './likes/like.module';
+import { MlApiModule } from 'machineLearningApi/mlApi.module';
 @Module({
   imports: [
     MongooseModule.forRoot(
       'mongodb+srv://gimenezzmaximiliano:u7ty5OFFD2EO4cAp@air-note-db.xhrxjga.mongodb.net/?retryWrites=true&w=majority&appName=air-note-db',
     ),
     NotesModule,
+    MlApiModule,
     UsersModule,
     FirebaseAuthModule,
     FirebaseAdminModule,

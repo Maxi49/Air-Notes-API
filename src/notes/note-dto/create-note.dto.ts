@@ -1,5 +1,5 @@
 import { Scope } from '@nestjs/common';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateNoteDto {
   @IsString()
@@ -18,6 +18,7 @@ export class CreateNoteDto {
 
   @IsString()
   @IsNotEmpty()
+  @IsOptional()
   image: string;
 
   @IsString()

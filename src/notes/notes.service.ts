@@ -11,15 +11,17 @@ import { Model } from 'mongoose';
 import { CreateNoteDto } from './note-dto/create-note.dto';
 import { UpdateNoteDto } from './note-dto/update-note.dto';
 import { UserService } from 'src/users/users.service';
-import { MlApiService } from 'machineLearningApi/mlApi.service';
+import { VectorService } from 'src/vectors/vector.service';
+import { CloudinaryImageManagmentService } from 'src/cloudinary/cloudinaryImageManagment.service';
 
 @Injectable()
 export class NotesService {
   constructor(
     @InjectModel(Note.name) private noteModel: Model<Note>,
     @Inject(forwardRef(() => UserService))
+    private readonly cloudinaryImageManagmentService: CloudinaryImageManagmentService,
     private readonly userService: UserService,
-    private readonly mlApiService: MlApiService,
+    private readonly vectorService: VectorService,
   ) {}
 
   async findAllNotes() {
@@ -45,21 +47,35 @@ export class NotesService {
   }
 
   async createNote(userId: string, note: CreateNoteDto) {
+    const formData = new FormData();
+
     const { description, location, title, country, image, scope } = note;
     console.log('userId provided: ', userId);
-    const classifiedText = await this.mlApiService.getTextClasses(description);
 
-    console.log(classifiedText);
+    formData.append('image', image);
 
-    return await this.noteModel.create({
+    const imageUrl = this.cloudinaryImageManagmentService.uploadImage(formData);
+
+    console.log(formData);
+
+    const vectorPostIdentifier = await this.vectorService.createVector(
+      description,
+      image,
+    );
+
+    const post = await this.noteModel.create({
       user: userId,
       title,
       country,
       description,
-      image,
+      image: formData,
       location,
       scope,
     });
+
+    console.log(vectorPostIdentifier);
+
+    return post;
   }
 
   async updateNote(userId: string, id: string, note: UpdateNoteDto) {

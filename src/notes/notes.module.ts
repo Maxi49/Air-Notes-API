@@ -4,11 +4,13 @@ import { Note, NoteSchema } from './noteSchema/note-schema';
 import { NotesService } from './notes.service';
 import { NotesController } from './notes.controller';
 import { UsersModule } from 'src/users/users.module';
-import { MlApiModule } from 'machineLearningApi/mlApi.module';
+import { VectorModule } from 'src/vectors/vectors.module';
+import { CloudinaryImageManagmentModule } from 'src/cloudinary/cloudinaryImageManagment.module';
 
 @Module({
   imports: [
-    MlApiModule,
+    CloudinaryImageManagmentModule,
+    VectorModule,
     forwardRef(() => UsersModule),
     MongooseModule.forFeature([
       {

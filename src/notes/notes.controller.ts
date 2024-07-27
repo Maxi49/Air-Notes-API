@@ -52,6 +52,7 @@ export class NotesController {
   @UseGuards(AuthGuard)
   async create(@Body() note: CreateNoteDto, @CurrentUser() user: any) {
     try {
+      console.log(note);
       const id = user._id;
       return await this.notesService.createNote(id, note);
     } catch (error) {

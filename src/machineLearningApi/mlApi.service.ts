@@ -5,18 +5,17 @@ import axios from 'axios';
 export class MlApiService {
   async createPostVectorIdentifier(text: string, img: string): Promise<string> {
     try {
-      const formData = new FormData();
-
-      formData.append('image', img);
-
-      const response = await axios.post(
+      const res = await axios.post(
         'http://127.0.0.1:8000/create-vector-classificator',
         {
-          text: text,
-          img: formData,
+          text,
+          img,
         },
       );
-      return response.data;
+
+      const vector = res.data.vector;
+
+      return vector;
     } catch (error) {
       throw new BadRequestException(error);
     }

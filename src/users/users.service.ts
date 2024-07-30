@@ -14,13 +14,15 @@ import { CreateUserDto } from './user-dto/create-user.dto';
 import { FirebaseAdminService } from 'src/firebaseAdmin/firebaseAdmin.service';
 import { NotesService } from 'src/notes/notes.service';
 import { UserDto } from './user-dto/user.dto';
+import { VectorService } from 'src/vectors/vector.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
-    private firebaseAuthService: FirebaseAuthService,
-    private firebaseAdminService: FirebaseAdminService,
+    private readonly vectorService: VectorService,
+    private readonly firebaseAuthService: FirebaseAuthService,
+    private readonly firebaseAdminService: FirebaseAdminService,
     @Inject(forwardRef(() => NotesService)) private noteService: NotesService,
   ) {}
 
@@ -74,6 +76,8 @@ export class UserService {
         age,
         location,
       });
+
+      await this.vectorService.createUserVectorPreferences(newUser._id);
 
       return newUser;
     } catch (error) {

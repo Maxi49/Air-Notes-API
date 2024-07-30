@@ -11,26 +11,41 @@ export class VectorService {
     private readonly mlApiService: MlApiService,
   ) {}
 
-  async createVector(
-    note: mongoose.Types.ObjectId,
+  async createVectorIdentifier(
+    postId: mongoose.Types.ObjectId,
     descriptionText: string,
     image: string,
   ): Promise<Vector | unknown> {
     try {
-      const vector = this.mlApiService.createPostVectorIdentifier(
+      const vector = await this.mlApiService.createPostVectorIdentifier(
         descriptionText,
         image,
       );
-
-      const postVector = this.vectorModel.create({
-        note,
-        vector,
+      console.log(vector);
+      const postVector = await this.vectorModel.create({
+        postId: postId,
+        vector: vector,
       });
 
-      return postVector;
+      console.log(postVector.vector);
+
+      return postVector.vector;
     } catch (error) {
       throw new BadRequestException(error);
     }
+  }
+
+  async createUserVectorPreferences(userId: mongoose.Types.ObjectId) {
+    const defaultPreferences = [
+      0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,
+    ];
+
+    const vector = this.vectorModel.create({
+      userId,
+      vector: defaultPreferences,
+    });
+
+    return vector;
   }
 
   async vectorSimilaritySearch(vector: Vector) {

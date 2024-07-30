@@ -6,9 +6,11 @@ import { UserService } from './users.service';
 import { UserController } from './users.controller';
 import { FirebaseAdminModule } from 'src/firebaseAdmin/firebaseAdmin.module';
 import { FirebaseAuthModule } from 'src/firebaseAuth/firebaseAuth.module';
+import { VectorModule } from 'src/vectors/vectors.module';
 
 @Module({
   imports: [
+    VectorModule,
     FirebaseAdminModule,
     FirebaseAuthModule,
     forwardRef(() => NotesModule),

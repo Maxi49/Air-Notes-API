@@ -7,16 +7,19 @@ import {
   Param,
   Patch,
   Post,
+  UploadedFile,
   UseFilters,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { NotesService } from './notes.service';
 import { HttpExceptionFilter } from 'src/ErrorHandlers/errorHandlers';
 import { AuthGuard } from 'src/Guards/auth.guard';
-import { CreateNoteDto } from './note-dto/create-note.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateNoteDto } from './note-dto/update-note.dto';
 import { CurrentUser } from 'src/CustomDecorators/getCurrentUser';
 import { UserDto } from 'src/users/user-dto/user.dto';
+import { CreateNoteDto } from './note-dto/create-note.dto';
 
 @Controller('notes')
 @UseFilters(new HttpExceptionFilter())
@@ -50,12 +53,23 @@ export class NotesController {
 
   @Post('new-note')
   @UseGuards(AuthGuard)
-  async create(@Body() note: CreateNoteDto, @CurrentUser() user: any) {
+  @UseInterceptors(FileInterceptor('file'))
+  async create(
+    @Body() note: CreateNoteDto,
+    @CurrentUser() user: any,
+    @UploadedFile() file,
+  ) {
     try {
-      console.log(note);
+      console.log(file.filename, file.path);
       const id = user._id;
-      return await this.notesService.createNote(id, note);
+
+      // TODO Setea el uso de imagenes para la segunda api (python)
+      console.log('holis');
+      const createdNote = await this.notesService.createNote(id, note, file);
+
+      return createdNote;
     } catch (error) {
+      console.log(error);
       throw new BadRequestException(error);
     }
   }

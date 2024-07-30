@@ -3,7 +3,11 @@ import { v2 as cloudinary } from 'cloudinary';
 
 @Injectable()
 export class CloudinaryConfig {
-  static initializeCloudinary() {
+  constructor() {
+    this.initializeCloudinary();
+  }
+
+  private initializeCloudinary() {
     cloudinary.config({
       cloud_name: 'dlkavvzmv',
       api_key: '711466671769883',
@@ -11,9 +15,9 @@ export class CloudinaryConfig {
     });
   }
 
-  async uploadImage(img: string) {
+  async uploadImage(img: any) {
     try {
-      const uploadResult = await cloudinary.uploader.upload(img, {
+      const uploadResult = await cloudinary.uploader.upload(img.path, {
         public_id: `${Date.now()}-${Math.random().toString(36).substring(7)}`,
       });
 

@@ -12,15 +12,15 @@ import { CreateNoteDto } from './note-dto/create-note.dto';
 import { UpdateNoteDto } from './note-dto/update-note.dto';
 import { UserService } from 'src/users/users.service';
 import { VectorService } from 'src/vectors/vector.service';
-import { CloudinaryImageManagmentService } from 'src/cloudinary/cloudinaryImageManagment.service';
+import { CloudinaryConfig } from 'src/cloudinary/cloudinary.config';
 
 @Injectable()
 export class NotesService {
   constructor(
     @InjectModel(Note.name) private noteModel: Model<Note>,
     @Inject(forwardRef(() => UserService))
-    private readonly cloudinaryImageManagmentService: CloudinaryImageManagmentService,
     private readonly userService: UserService,
+    private readonly cloudinaryImageManagmentService: CloudinaryConfig,
     private readonly vectorService: VectorService,
   ) {}
 
@@ -46,33 +46,31 @@ export class NotesService {
     return note;
   }
 
-  async createNote(userId: string, note: CreateNoteDto) {
-    const formData = new FormData();
-
-    const { description, location, title, country, image, scope } = note;
+  async createNote(userId: string, note: CreateNoteDto, file: any) {
+    const { description, location, title, country, scope } = note;
     console.log('userId provided: ', userId);
+    // @ts-expect-error im trying
+    const parsedLocation = JSON.parse(location);
 
-    formData.append('image', image);
-
-    const imageUrl = this.cloudinaryImageManagmentService.uploadImage(formData);
-
-    console.log(formData);
-
-    const vectorPostIdentifier = await this.vectorService.createVector(
-      description,
-      image,
-    );
+    const uploadedUrlImage =
+      await this.cloudinaryImageManagmentService.uploadImage(file);
 
     const post = await this.noteModel.create({
       user: userId,
       title,
       country,
       description,
-      image: formData,
-      location,
+      image: uploadedUrlImage.url,
+      location: parsedLocation,
       scope,
     });
 
+    const vectorPostIdentifier =
+      await this.vectorService.createVectorIdentifier(
+        post._id,
+        description,
+        uploadedUrlImage.url,
+      );
     console.log(vectorPostIdentifier);
 
     return post;

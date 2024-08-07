@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   Param,
   Patch,
   Post,
@@ -20,6 +21,7 @@ import { UpdateNoteDto } from './note-dto/update-note.dto';
 import { CurrentUser } from 'src/CustomDecorators/getCurrentUser';
 import { UserDto } from 'src/users/user-dto/user.dto';
 import { CreateNoteDto } from './note-dto/create-note.dto';
+import mongoose from 'mongoose';
 
 @Controller('notes')
 @UseFilters(new HttpExceptionFilter())
@@ -55,17 +57,22 @@ export class NotesController {
   @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async create(
+    @Headers('Authorization') token: string,
     @Body() note: CreateNoteDto,
     @CurrentUser() user: any,
-    @UploadedFile() file,
+    @UploadedFile() file: any,
   ) {
     try {
       console.log(file.filename, file.path);
+      console.log(token);
       const id = user._id;
 
-      // TODO Setea el uso de imagenes para la segunda api (python)
-      console.log('holis');
-      const createdNote = await this.notesService.createNote(id, note, file);
+      const createdNote = await this.notesService.createNote(
+        id,
+        note,
+        file,
+        token,
+      );
 
       return createdNote;
     } catch (error) {
@@ -78,14 +85,15 @@ export class NotesController {
   @UseGuards(AuthGuard)
   async update(
     @CurrentUser() user: UserDto,
-    @Param('id') noteId: string,
+    @Param('id') noteId: unknown,
     @Body()
     note: UpdateNoteDto,
   ) {
     try {
       const updatedNote = await this.notesService.updateNote(
-        user._id,
-        noteId,
+        // @ts-expect-error Types conevrtions
+        user._id as mongoose.Types.ObjectId,
+        noteId as mongoose.Types.ObjectId,
         note,
       );
       return updatedNote;

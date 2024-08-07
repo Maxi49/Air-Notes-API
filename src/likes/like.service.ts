@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  forwardRef,
-  Inject,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Like } from './likeSchema/like-schema';
 import { Model } from 'mongoose';
@@ -14,8 +9,6 @@ import { NotesService } from 'src/notes/notes.service';
 export class LikeService {
   constructor(
     @InjectModel(Like.name) private likeModel: Model<Like>,
-    @Inject(forwardRef(() => UserService))
-    @Inject(forwardRef(() => NotesService))
     private readonly userService: UserService,
     private readonly noteService: NotesService,
   ) {}

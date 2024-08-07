@@ -1,21 +1,26 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import axios from 'axios';
+import mongoose from 'mongoose';
+import { AwsService } from 'src/aws-sqs-service/aws.service';
 
 @Injectable()
 export class MlApiService {
-  async createPostVectorIdentifier(text: string, img: string): Promise<string> {
+  constructor(private readonly awsService: AwsService) {}
+
+  async sendVectorData(
+    token: string,
+    postId: mongoose.Types.ObjectId,
+    text: string,
+    imgUrl: string,
+  ): Promise<string> {
     try {
-      const res = await axios.post(
-        'http://127.0.0.1:8000/create-vector-classificator',
-        {
-          text,
-          img,
-        },
-      );
+      await this.awsService.sendSQSMessage({
+        token,
+        postId,
+        text,
+        imgUrl,
+      });
 
-      const vector = res.data.vector;
-
-      return vector;
+      return;
     } catch (error) {
       throw new BadRequestException(error);
     }

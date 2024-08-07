@@ -28,6 +28,8 @@ export class Note {
   @Prop({ required: true })
   country: string;
 
+  @Prop({ required: false })
+  vector: Array<number>;
   // TODO add "completed" prop and set it as boolean
 
   @Prop({ required: true, type: String })

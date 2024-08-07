@@ -10,10 +10,10 @@ import { VectorModule } from 'src/vectors/vectors.module';
 
 @Module({
   imports: [
-    VectorModule,
+    forwardRef(() => VectorModule),
+    forwardRef(() => NotesModule),
     FirebaseAdminModule,
     FirebaseAuthModule,
-    forwardRef(() => NotesModule),
     MongooseModule.forFeature([
       {
         name: User.name,

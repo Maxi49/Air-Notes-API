@@ -1,5 +1,5 @@
 import { Scope } from '@nestjs/common';
-import { IsOptional, IsString, IsMongoId } from 'class-validator';
+import { IsOptional, IsString, IsMongoId, IsArray } from 'class-validator';
 
 export class UpdateNoteDto {
   @IsMongoId()
@@ -22,12 +22,16 @@ export class UpdateNoteDto {
 
   @IsString()
   @IsOptional()
-  image: string;
+  image?: string;
 
   @IsString()
   @IsOptional()
-  country: string;
+  country?: string;
+
+  @IsArray()
+  @IsOptional()
+  vector?: number[];
 
   @IsOptional()
-  scope: Scope;
+  scope?: Scope;
 }

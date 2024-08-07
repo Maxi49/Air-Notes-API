@@ -20,10 +20,11 @@ import { VectorService } from 'src/vectors/vector.service';
 export class UserService {
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
+    @Inject(forwardRef(() => VectorService))
     private readonly vectorService: VectorService,
     private readonly firebaseAuthService: FirebaseAuthService,
     private readonly firebaseAdminService: FirebaseAdminService,
-    @Inject(forwardRef(() => NotesService)) private noteService: NotesService,
+    private noteService: NotesService,
   ) {}
 
   async findAllUsers() {

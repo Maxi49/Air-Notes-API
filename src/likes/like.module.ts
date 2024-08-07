@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { LikeService } from './like.service';
 import { LikeController } from './like.controller';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -8,8 +8,8 @@ import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
-    forwardRef(() => NotesModule),
-    forwardRef(() => UsersModule),
+    NotesModule,
+    UsersModule,
     MongooseModule.forFeature([
       {
         name: Like.name,

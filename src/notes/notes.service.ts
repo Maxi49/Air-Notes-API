@@ -7,10 +7,9 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Note } from './noteSchema/note-schema';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { CreateNoteDto } from './note-dto/create-note.dto';
 import { UpdateNoteDto } from './note-dto/update-note.dto';
-import { UserService } from 'src/users/users.service';
 import { VectorService } from 'src/vectors/vector.service';
 import { CloudinaryConfig } from 'src/cloudinary/cloudinary.config';
 
@@ -18,9 +17,8 @@ import { CloudinaryConfig } from 'src/cloudinary/cloudinary.config';
 export class NotesService {
   constructor(
     @InjectModel(Note.name) private noteModel: Model<Note>,
-    @Inject(forwardRef(() => UserService))
-    private readonly userService: UserService,
     private readonly cloudinaryImageManagmentService: CloudinaryConfig,
+    @Inject(forwardRef(() => VectorService))
     private readonly vectorService: VectorService,
   ) {}
 
@@ -46,10 +44,16 @@ export class NotesService {
     return note;
   }
 
-  async createNote(userId: string, note: CreateNoteDto, file: any) {
+  async createNote(
+    userId: string,
+    note: CreateNoteDto,
+    file: any,
+    token: string,
+  ) {
     const { description, location, title, country, scope } = note;
     console.log('userId provided: ', userId);
-    // @ts-expect-error im trying
+
+    // @ts-expect-error This cames here as a string
     const parsedLocation = JSON.parse(location);
 
     const uploadedUrlImage =
@@ -65,18 +69,21 @@ export class NotesService {
       scope,
     });
 
-    const vectorPostIdentifier =
-      await this.vectorService.createVectorIdentifier(
-        post._id,
-        description,
-        uploadedUrlImage.url,
-      );
-    console.log(vectorPostIdentifier);
+    this.vectorService.sendVectorIdentifier(
+      token,
+      post._id,
+      description,
+      uploadedUrlImage.url,
+    );
 
     return post;
   }
 
-  async updateNote(userId: string, id: string, note: UpdateNoteDto) {
+  async updateNote(
+    userId: mongoose.Types.ObjectId,
+    id: mongoose.Types.ObjectId,
+    note: UpdateNoteDto,
+  ) {
     const updatedNote = await this.noteModel.findByIdAndUpdate(
       { _id: id, user: userId },
       { ...note },
@@ -100,10 +107,13 @@ export class NotesService {
       throw new BadRequestException(error);
     }
   }
+
+  /* Si yo solo necesito el valor actual de la ubicacion del usuario, no se lo voy a pasar de esa manera evidentemete, si no que se lo pasaria desde propio front con la ubicacion actualizada*/
   async findNotesNearUser(userId: string) {
     try {
-      const user = await this.userService.findUserById(userId);
-
+      console.log(userId);
+      // TODO Re-do the logic of this function
+      /*
       const filter = {
         location: {
           $near: {
@@ -114,9 +124,8 @@ export class NotesService {
             $maxDistance: 50,
           },
         },
-      };
-      const notes = await this.noteModel.find(filter);
-      return notes; // {item: note}
+      };*/
+      return; // {item: note}
     } catch (error) {
       throw new BadRequestException(error);
     }

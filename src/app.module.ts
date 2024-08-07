@@ -8,6 +8,7 @@ import { LikesModule } from './likes/like.module';
 import { MlApiModule } from 'src/machineLearningApi/mlApi.module';
 import { VectorModule } from './vectors/vectors.module';
 import { CloudinaryImageManagmentModule } from './cloudinary/cloudinaryImageManagment.module';
+import { AwsModule } from './aws-sqs-service/aws.module';
 @Module({
   imports: [
     MongooseModule.forRoot(
@@ -21,6 +22,7 @@ import { CloudinaryImageManagmentModule } from './cloudinary/cloudinaryImageMana
     FirebaseAdminModule,
     LikesModule,
     VectorModule,
+    AwsModule,
   ],
 })
 export class AppModule {}

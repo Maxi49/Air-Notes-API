@@ -4,6 +4,7 @@ import {
   SendMessageCommand,
   SQSClient,
   SendMessageCommandOutput,
+  DeleteMessageCommand,
 } from '@aws-sdk/client-sqs';
 import { BadRequestException } from '@nestjs/common';
 
@@ -26,9 +27,12 @@ export class AwsConfig {
     });
   }
 
-  async sendMessage(message: object): Promise<SendMessageCommandOutput> {
+  // TODO add type to parameter message
+  async sendMessage(message: any): Promise<SendMessageCommandOutput> {
     try {
       const command = new SendMessageCommand({
+        MessageGroupId: message.postId,
+        MessageDeduplicationId: message.postId,
         QueueUrl: this.SQSurl,
         MessageBody: JSON.stringify(message),
       });
@@ -36,6 +40,21 @@ export class AwsConfig {
       const messageSent = await this.sqsClient.send(command);
 
       return messageSent;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  async killMessage(handleReceipt: string) {
+    try {
+      const command = new DeleteMessageCommand({
+        QueueUrl: this.SQSurl,
+        ReceiptHandle: handleReceipt,
+      });
+
+      const deletedMessage = this.sqsClient.send(command);
+
+      return deletedMessage;
     } catch (error) {
       throw new BadRequestException(error);
     }

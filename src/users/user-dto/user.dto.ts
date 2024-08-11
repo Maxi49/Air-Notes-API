@@ -1,5 +1,7 @@
+import mongoose from 'mongoose';
+
 export class UserDto {
-  _id: string;
+  _id: mongoose.Types.ObjectId;
   username: string;
   name: string;
   age: number;
@@ -9,4 +11,6 @@ export class UserDto {
     type: string;
     coordinates: number[];
   };
+  firebaseUID: string; // Nuevo campo
+  profilePicture: string; // Nuevo campo
 }

@@ -3,8 +3,8 @@ import mongoose from 'mongoose';
 
 @Schema({ timestamps: true })
 export class User {
-  @Prop({ type: mongoose.Types.ObjectId })
-  _id: mongoose.Types.ObjectId;
+  @Prop({ type: mongoose.Types.ObjectId, required: false })
+  _id: string;
 
   @Prop({ required: true, unique: true })
   username: string;

@@ -40,25 +40,39 @@ export class VectorService {
   }
 
   async createVector(
-    userId: mongoose.Types.ObjectId,
+    userId: string,
     noteId: mongoose.Types.ObjectId,
     vector: Vector,
+    receiptHandle: string,
   ) {
-    const postVector = await this.vectorModel.create({
-      postId: noteId,
-      vector: vector,
-    });
+    try {
+      console.log(receiptHandle);
+      console.log(vector);
+      console.log(noteId);
+      const postVector = await this.vectorModel.create({
+        postId: noteId,
+        vector: vector,
+      });
+      console.log(postVector);
+      const updatedNote = await this.noteService.updateNote(userId, noteId, {
+        vector: postVector.vector,
+        vectorId: postVector._id,
+      });
 
-    const updatedNote = await this.noteService.updateNote(userId, noteId, {
-      vector: postVector.vector,
-    });
+      await this.mlApiService.deleteMessageVectorData(receiptHandle);
 
-    return updatedNote;
+      console.log('updated: ', updatedNote);
+
+      return updatedNote;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 
   // TODO use this function when creating a new user
+  /* TODO Add vector types such as : postVector or userVector. So then it will filter the vectors in the correct way */
 
-  async createUserVectorPreferences(userId: mongoose.Types.ObjectId) {
+  async createUserVectorPreferences(userId: string) {
     const defaultPreferences = [
       0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,
     ];

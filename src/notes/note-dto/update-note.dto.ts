@@ -1,5 +1,6 @@
 import { Scope } from '@nestjs/common';
 import { IsOptional, IsString, IsMongoId, IsArray } from 'class-validator';
+import mongoose from 'mongoose';
 
 export class UpdateNoteDto {
   @IsMongoId()
@@ -27,6 +28,9 @@ export class UpdateNoteDto {
   @IsString()
   @IsOptional()
   country?: string;
+
+  @IsOptional()
+  vectorId?: mongoose.Types.ObjectId;
 
   @IsArray()
   @IsOptional()

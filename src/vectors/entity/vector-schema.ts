@@ -10,10 +10,7 @@ export class Vector {
   userId: string;
 
   @Prop({ required: true })
-  vector: Array<number>;
-
-  @Prop({ required: true })
-  forEntity: 'user' | 'post';
+  vector: Array<number> | number[];
 }
 
 export const VectorSchema = SchemaFactory.createForClass(Vector);

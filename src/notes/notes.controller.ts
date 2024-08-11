@@ -63,8 +63,8 @@ export class NotesController {
     @UploadedFile() file: any,
   ) {
     try {
-      console.log(file.filename, file.path);
       console.log(token);
+      console.log(file);
       const id = user._id;
 
       const createdNote = await this.notesService.createNote(
@@ -84,15 +84,14 @@ export class NotesController {
   @Patch(':id')
   @UseGuards(AuthGuard)
   async update(
-    @CurrentUser() user: UserDto,
+    @CurrentUser() user: any,
     @Param('id') noteId: unknown,
     @Body()
     note: UpdateNoteDto,
   ) {
     try {
       const updatedNote = await this.notesService.updateNote(
-        // @ts-expect-error Types conevrtions
-        user._id as mongoose.Types.ObjectId,
+        user._id as string,
         noteId as mongoose.Types.ObjectId,
         note,
       );

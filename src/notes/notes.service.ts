@@ -80,7 +80,7 @@ export class NotesService {
   }
 
   async updateNote(
-    userId: mongoose.Types.ObjectId,
+    userId: string,
     id: mongoose.Types.ObjectId,
     note: UpdateNoteDto,
   ) {
@@ -92,14 +92,14 @@ export class NotesService {
     return updatedNote;
   }
 
-  async removeNote(noteId: string, userId: string) {
+  async removeNote(noteId: string, userId: mongoose.Types.ObjectId) {
     try {
       return await this.noteModel.findByIdAndDelete({ _id: noteId, userId });
     } catch (error) {
       throw new BadRequestException(error);
     }
   }
-  async removeAllUserNotes(userId: string) {
+  async removeAllUserNotes(userId: unknown) {
     try {
       await this.noteModel.deleteMany({ user: userId });
       return true;
@@ -109,7 +109,7 @@ export class NotesService {
   }
 
   /* Si yo solo necesito el valor actual de la ubicacion del usuario, no se lo voy a pasar de esa manera evidentemete, si no que se lo pasaria desde propio front con la ubicacion actualizada*/
-  async findNotesNearUser(userId: string) {
+  async findNotesNearUser(userId: mongoose.Types.ObjectId) {
     try {
       console.log(userId);
       // TODO Re-do the logic of this function

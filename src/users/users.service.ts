@@ -43,6 +43,8 @@ export class UserService {
         firebaseUID: id,
       });
 
+      console.log(user._id);
+
       return user;
     } catch (error) {
       throw new BadRequestException(error);
@@ -92,7 +94,7 @@ export class UserService {
     return user;
   }
 
-  async updateUserEmail(userId: string, newEmail: User) {
+  async updateUserEmail(userId: unknown, newEmail: User) {
     try {
       const { email } = newEmail;
       await this.firebaseAdminService.updateEmail(userId, email);
@@ -102,7 +104,7 @@ export class UserService {
     }
   }
 
-  async updateUserPass(userId: string, pass: any) {
+  async updateUserPass(userId: unknown, pass: any) {
     try {
       const { password } = pass;
 
@@ -113,7 +115,7 @@ export class UserService {
     }
   }
 
-  async updateUserProfile(id: string, user: UpdateUserDto): Promise<User> {
+  async updateUserProfile(id: unknown, user: UpdateUserDto): Promise<User> {
     try {
       return await this.userModel.findByIdAndUpdate(
         id,

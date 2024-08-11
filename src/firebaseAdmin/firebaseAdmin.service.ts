@@ -6,14 +6,16 @@ import { FirebaseAdminConfig } from './firebaseAdmin.config';
 export class FirebaseAdminService {
   private auth: admin.auth.Auth;
 
+  // TODO fix: Make that the service dont creates a new user in the firebase database till the user is succesfully created on the mongo DB databse
+
   constructor() {
     FirebaseAdminConfig.initializeFirebase();
     this.auth = admin.auth();
   }
 
-  async updateEmail(uid: string, newEmail: string) {
+  async updateEmail(uid: unknown, newEmail: string) {
     try {
-      await this.auth.updateUser(uid, { email: newEmail });
+      await this.auth.updateUser(uid as string, { email: newEmail });
       return true;
     } catch (err) {
       console.error(err);
@@ -21,9 +23,9 @@ export class FirebaseAdminService {
     }
   }
 
-  async updatePassword(uid: string, newPass: string) {
+  async updatePassword(uid: unknown, newPass: string) {
     try {
-      await this.auth.updateUser(uid, { password: newPass });
+      await this.auth.updateUser(uid as string, { password: newPass });
       return true;
     } catch (err) {
       console.error(err);
@@ -31,9 +33,10 @@ export class FirebaseAdminService {
     }
   }
 
-  async deleteUser(uid: string) {
+  // TODO FIX TYPES
+  async deleteUser(uid: unknown) {
     try {
-      await this.auth.deleteUser(uid);
+      await this.auth.deleteUser(uid as string);
     } catch (error) {
       throw new BadRequestException(error);
     }

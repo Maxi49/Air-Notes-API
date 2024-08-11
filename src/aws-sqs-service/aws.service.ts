@@ -11,4 +11,10 @@ export class AwsService {
 
     return messageSent;
   }
+
+  async deleteSQSMesssage(handleReceipt: string) {
+    const deletedMessage = await this.awsConfig.killMessage(handleReceipt);
+
+    return deletedMessage;
+  }
 }

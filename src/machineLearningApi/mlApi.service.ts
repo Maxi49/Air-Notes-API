@@ -25,4 +25,15 @@ export class MlApiService {
       throw new BadRequestException(error);
     }
   }
+
+  async deleteMessageVectorData(handleReceipt: string) {
+    try {
+      const deletedMessage =
+        await this.awsService.deleteSQSMesssage(handleReceipt);
+
+      return deletedMessage;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
 }

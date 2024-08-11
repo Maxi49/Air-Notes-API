@@ -28,8 +28,11 @@ export class Note {
   @Prop({ required: true })
   country: string;
 
+  @Prop({ required: false, ref: 'Vector', type: mongoose.Types.ObjectId })
+  vectorId: mongoose.Types.ObjectId;
+
   @Prop({ required: false })
-  vector: Array<number>;
+  vector: number[];
   // TODO add "completed" prop and set it as boolean
 
   @Prop({ required: true, type: String })

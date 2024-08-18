@@ -1,5 +1,4 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import mongoose from 'mongoose';
 import { AwsService } from 'src/aws-sqs-service/aws.service';
 
 @Injectable()
@@ -8,7 +7,7 @@ export class MlApiService {
 
   async sendVectorData(
     token: string,
-    postId: mongoose.Types.ObjectId,
+    postId: string,
     text: string,
     imgUrl: string,
   ): Promise<string> {

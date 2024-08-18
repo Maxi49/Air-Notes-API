@@ -2,15 +2,19 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Like } from './likeSchema/like-schema';
 import { Model } from 'mongoose';
-import { UserService } from 'src/users/users.service';
 import { NotesService } from 'src/notes/notes.service';
+import { VectorService } from 'src/vectors/vector.service';
+import { UserService } from 'src/users/users.service';
+import { UserDto } from 'src/users/user-dto/user.dto';
 
 @Injectable()
 export class LikeService {
   constructor(
     @InjectModel(Like.name) private likeModel: Model<Like>,
-    private readonly userService: UserService,
+
     private readonly noteService: NotesService,
+    private readonly vectorService: VectorService,
+    private readonly userService: UserService,
   ) {}
 
   async getLikes(userId: string, noteId: string): Promise<Like[] | unknown[]> {
@@ -22,13 +26,25 @@ export class LikeService {
     }
   }
 
-  async addLike(userId: string, noteId: string): Promise<boolean> {
+  async addLike(user: UserDto, noteId: string): Promise<Like | boolean> {
     try {
-      const likeExists = await this.getLikes(userId, noteId);
+      const likeExists = await this.getLikes(user._id.toString(), noteId);
       if (likeExists.length !== 0) return false;
-      await this.likeModel.create({ user: userId, note: noteId });
+      const like = await this.likeModel.create({
+        user: user._id.toString(),
+        note: noteId,
+      });
 
-      return true;
+      console.log('holis');
+      const smth = await this.userService.updateUserPreferences(
+        user._id,
+        noteId,
+      );
+
+      console.log('pasamos todo casi');
+      console.log(smth);
+
+      return like;
     } catch (error) {
       throw new BadRequestException(error);
     }

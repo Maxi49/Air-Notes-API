@@ -12,7 +12,7 @@ export class VectorController {
   constructor(private readonly vectorService: VectorService) {}
 
   @Post('create-vector')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard) // TODO ADD TYPE FOR BODY
   async createVector(@CurrentUser() user: UserDto, @Body() data: any) {
     console.log(data);
     const { data: vector } = data;
@@ -20,6 +20,7 @@ export class VectorController {
     console.log(vector);
 
     const createdVector = await this.vectorService.createVector(
+      'post',
       user._id.toString(),
       vector.note,
       vector.vector,

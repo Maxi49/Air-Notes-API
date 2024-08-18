@@ -16,10 +16,12 @@ export class CreateNoteDto {
     coordinates: number[];
   };
 
-  @IsString()
   @IsNotEmpty()
   @IsOptional()
-  image: string;
+  image: {
+    imageUrl: string;
+    publicImageId: string;
+  };
 
   @IsString()
   @IsNotEmpty()

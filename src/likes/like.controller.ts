@@ -13,8 +13,8 @@ export class LikeController {
     @Param('id') id: string,
     @CurrentUser() user: any,
   ): Promise<Like | boolean> {
-    const addedLike = await this.likeService.addLike(user, id);
-    return addedLike;
+    const like = await this.likeService.addLike(user, id);
+    return like;
   }
 
   @Delete(':id')

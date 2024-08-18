@@ -21,7 +21,6 @@ import { UpdateNoteDto } from './note-dto/update-note.dto';
 import { CurrentUser } from 'src/CustomDecorators/getCurrentUser';
 import { UserDto } from 'src/users/user-dto/user.dto';
 import { CreateNoteDto } from './note-dto/create-note.dto';
-import mongoose from 'mongoose';
 
 @Controller('notes')
 @UseFilters(new HttpExceptionFilter())
@@ -84,15 +83,15 @@ export class NotesController {
   @Patch(':id')
   @UseGuards(AuthGuard)
   async update(
-    @CurrentUser() user: any,
-    @Param('id') noteId: unknown,
+    @CurrentUser() user: UserDto,
+    @Param('id') noteId: string,
     @Body()
     note: UpdateNoteDto,
   ) {
     try {
       const updatedNote = await this.notesService.updateNote(
-        user._id as string,
-        noteId as mongoose.Types.ObjectId,
+        user._id,
+        noteId,
         note,
       );
       return updatedNote;

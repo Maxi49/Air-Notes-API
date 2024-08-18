@@ -15,6 +15,7 @@ import { FirebaseAdminService } from 'src/firebaseAdmin/firebaseAdmin.service';
 import { NotesService } from 'src/notes/notes.service';
 import { UserDto } from './user-dto/user.dto';
 import { VectorService } from 'src/vectors/vector.service';
+import { Vector } from 'src/vectors/entity/vector-schema';
 
 @Injectable()
 export class UserService {
@@ -63,30 +64,26 @@ export class UserService {
   }
 
   async register(user: CreateUserDto) {
-    try {
-      const { age, email, location, name, password, username, profilePicture } =
-        user;
-      const { user: userID } = await this.firebaseAuthService.register(
-        email,
-        password,
-      );
-      const newUser = await this.userModel.create({
-        profilePicture,
-        email,
-        username,
-        name,
-        firebaseUID: userID.uid,
-        age,
-        location,
-      });
+    const { age, email, location, name, password, username, profilePicture } =
+      user;
+    const { user: userID } = await this.firebaseAuthService.register(
+      email,
+      password,
+    );
 
-      await this.vectorService.createUserVectorPreferences(newUser._id);
+    const newUser = await this.userModel.create({
+      profilePicture,
+      email,
+      username,
+      name,
+      firebaseUID: userID.uid,
+      age,
+      location,
+    });
 
-      return newUser;
-    } catch (error) {
-      console.log(error);
-      throw new BadRequestException(error);
-    }
+    await this.vectorService.createUserVectorPreferences(newUser._id);
+
+    return newUser;
   }
 
   async login(email: string, pass: string) {
@@ -94,7 +91,7 @@ export class UserService {
     return user;
   }
 
-  async updateUserEmail(userId: unknown, newEmail: User) {
+  async updateUserEmail(userId: string, newEmail: User) {
     try {
       const { email } = newEmail;
       await this.firebaseAdminService.updateEmail(userId, email);
@@ -104,7 +101,7 @@ export class UserService {
     }
   }
 
-  async updateUserPass(userId: unknown, pass: any) {
+  async updateUserPass(userId: string, pass: any) {
     try {
       const { password } = pass;
 
@@ -115,7 +112,7 @@ export class UserService {
     }
   }
 
-  async updateUserProfile(id: unknown, user: UpdateUserDto): Promise<User> {
+  async updateUserProfile(id: string, user: UpdateUserDto): Promise<User> {
     try {
       return await this.userModel.findByIdAndUpdate(
         id,
@@ -139,4 +136,37 @@ export class UserService {
       throw new BadRequestException(error);
     }
   }
+
+  async updateUserPreferences(
+    userId: string,
+    noteId: string,
+  ): Promise<boolean> {
+    const userVector: Vector =
+      await this.vectorService.findVectorByUserId(userId);
+
+    console.log('user vector: ', userVector.vector);
+
+    const { vector: postVector } = await this.noteService.findNoteById(noteId);
+
+    console.log('post vector: ', postVector);
+
+    const resultVector = [];
+
+    for (let i = 0; i < postVector.length; i++) {
+      const product = userVector.vector[i] * postVector[i];
+      resultVector.push(product);
+    }
+
+    console.log(resultVector);
+
+    await this.vectorService.updateVector(userVector._id, resultVector);
+
+    return true;
+  }
 }
+
+/**
+ *   
+  "password": "testpassword",
+  "email": "maximussuper243@gmail.com",
+*/

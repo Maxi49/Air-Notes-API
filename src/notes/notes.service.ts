@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Note } from './noteSchema/note-schema';
-import mongoose, { Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { CreateNoteDto } from './note-dto/create-note.dto';
 import { UpdateNoteDto } from './note-dto/update-note.dto';
 import { VectorService } from 'src/vectors/vector.service';
@@ -59,19 +59,24 @@ export class NotesService {
     const uploadedUrlImage =
       await this.cloudinaryImageManagmentService.uploadImage(file);
 
+    const imageData = {
+      imageUrl: uploadedUrlImage.url,
+      publicImageId: uploadedUrlImage.public_id,
+    };
+
     const post = await this.noteModel.create({
       user: userId,
       title,
       country,
       description,
-      image: uploadedUrlImage.url,
+      image: imageData,
       location: parsedLocation,
       scope,
     });
 
     this.vectorService.sendVectorIdentifier(
       token,
-      post._id,
+      post._id.toString(),
       description,
       uploadedUrlImage.url,
     );
@@ -79,11 +84,7 @@ export class NotesService {
     return post;
   }
 
-  async updateNote(
-    userId: string,
-    id: mongoose.Types.ObjectId,
-    note: UpdateNoteDto,
-  ) {
+  async updateNote(userId: string, id: string, note: UpdateNoteDto) {
     const updatedNote = await this.noteModel.findByIdAndUpdate(
       { _id: id, user: userId },
       { ...note },
@@ -92,14 +93,25 @@ export class NotesService {
     return updatedNote;
   }
 
-  async removeNote(noteId: string, userId: mongoose.Types.ObjectId) {
+  async removeNote(noteId: string, userId: string) {
     try {
-      return await this.noteModel.findByIdAndDelete({ _id: noteId, userId });
+      const deletedNote = await this.noteModel.findByIdAndDelete({
+        _id: noteId,
+        userId,
+      });
+
+      await this.vectorService.deleteVector(deletedNote.vectorId);
+
+      await this.cloudinaryImageManagmentService.deleteCloudinaryImages(
+        deletedNote.image.publicImageId,
+      );
+      return true;
     } catch (error) {
       throw new BadRequestException(error);
     }
   }
-  async removeAllUserNotes(userId: unknown) {
+
+  async removeAllUserNotes(userId: string) {
     try {
       await this.noteModel.deleteMany({ user: userId });
       return true;
@@ -109,7 +121,7 @@ export class NotesService {
   }
 
   /* Si yo solo necesito el valor actual de la ubicacion del usuario, no se lo voy a pasar de esa manera evidentemete, si no que se lo pasaria desde propio front con la ubicacion actualizada*/
-  async findNotesNearUser(userId: mongoose.Types.ObjectId) {
+  async findNotesNearUser(userId: string) {
     try {
       console.log(userId);
       // TODO Re-do the logic of this function

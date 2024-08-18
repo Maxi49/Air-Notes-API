@@ -1,5 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { v2 as cloudinary } from 'cloudinary';
+import dotenv from 'dotenv';
+dotenv.config();
 
 @Injectable()
 export class CloudinaryConfig {
@@ -8,10 +10,14 @@ export class CloudinaryConfig {
   }
 
   private initializeCloudinary() {
+    const cloudName = process.env.cloudName;
+    const apiKey = process.env.apiKey;
+    const apiSecret = process.env.apiSecret;
+
     cloudinary.config({
-      cloud_name: 'dlkavvzmv',
-      api_key: '711466671769883',
-      api_secret: 'c_7VzklnvSm30UJ95ULzxg7mmoQ',
+      cloud_name: cloudName,
+      api_key: apiKey,
+      api_secret: apiSecret,
     });
   }
 
@@ -45,5 +51,23 @@ export class CloudinaryConfig {
     });
 
     return autoCropUrl;
+  }
+
+  async deleteCloudinaryImages(
+    publicId?: string | boolean,
+    imagesList?: string[],
+  ): Promise<boolean> {
+    try {
+      if (imagesList.length) {
+        await cloudinary.api.delete_resources(imagesList);
+        return true;
+      }
+
+      await cloudinary.uploader.destroy(publicId as string);
+
+      return true;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 }

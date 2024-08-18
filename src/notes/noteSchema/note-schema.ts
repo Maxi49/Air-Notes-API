@@ -22,17 +22,22 @@ export class Note {
     coordinates: number[];
   };
 
-  @Prop({ required: true })
-  image: string;
+  @Prop({
+    type: Object,
+    imageUrl: { type: String, required: true },
+    publicImageId: { type: String, required: true },
+  })
+  image: { imageUrl: string; publicImageId: string };
 
   @Prop({ required: true })
   country: string;
 
   @Prop({ required: false, ref: 'Vector', type: mongoose.Types.ObjectId })
-  vectorId: mongoose.Types.ObjectId;
+  vectorId: string;
 
   @Prop({ required: false })
   vector: number[];
+
   // TODO add "completed" prop and set it as boolean
 
   @Prop({ required: true, type: String })

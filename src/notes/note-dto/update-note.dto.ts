@@ -1,6 +1,5 @@
 import { Scope } from '@nestjs/common';
 import { IsOptional, IsString, IsMongoId, IsArray } from 'class-validator';
-import mongoose from 'mongoose';
 
 export class UpdateNoteDto {
   @IsMongoId()
@@ -21,16 +20,18 @@ export class UpdateNoteDto {
     coordinates: number[];
   };
 
-  @IsString()
   @IsOptional()
-  image?: string;
+  image?: {
+    imageUrl: string;
+    publicImageId: string;
+  };
 
   @IsString()
   @IsOptional()
   country?: string;
 
   @IsOptional()
-  vectorId?: mongoose.Types.ObjectId;
+  vectorId?: string;
 
   @IsArray()
   @IsOptional()

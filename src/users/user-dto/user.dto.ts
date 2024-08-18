@@ -1,12 +1,10 @@
-import mongoose from 'mongoose';
-
 export class UserDto {
-  _id: mongoose.Types.ObjectId;
+  _id?: string;
   username: string;
   name: string;
   age: number;
   email: string;
-  password: string;
+
   location: {
     type: string;
     coordinates: number[];

@@ -7,6 +7,7 @@ import {
   DeleteMessageCommand,
 } from '@aws-sdk/client-sqs';
 import { BadRequestException } from '@nestjs/common';
+import { SQSMessage } from './aws.service';
 
 export class AwsConfig {
   private SQSurl: string;
@@ -27,9 +28,10 @@ export class AwsConfig {
     });
   }
 
-  // TODO add type to parameter message
-  async sendMessage(message: any): Promise<SendMessageCommandOutput> {
+  async sendMessage(message): Promise<SendMessageCommandOutput> {
     try {
+      console.log('message id: ', message.postId);
+
       const command = new SendMessageCommand({
         MessageGroupId: message.postId,
         MessageDeduplicationId: message.postId,

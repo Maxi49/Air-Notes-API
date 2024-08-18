@@ -13,9 +13,9 @@ export class FirebaseAdminService {
     this.auth = admin.auth();
   }
 
-  async updateEmail(uid: unknown, newEmail: string) {
+  async updateEmail(uid: string, newEmail: string) {
     try {
-      await this.auth.updateUser(uid as string, { email: newEmail });
+      await this.auth.updateUser(uid, { email: newEmail });
       return true;
     } catch (err) {
       console.error(err);
@@ -23,9 +23,9 @@ export class FirebaseAdminService {
     }
   }
 
-  async updatePassword(uid: unknown, newPass: string) {
+  async updatePassword(uid: string, newPass: string) {
     try {
-      await this.auth.updateUser(uid as string, { password: newPass });
+      await this.auth.updateUser(uid, { password: newPass });
       return true;
     } catch (err) {
       console.error(err);
@@ -33,10 +33,9 @@ export class FirebaseAdminService {
     }
   }
 
-  // TODO FIX TYPES
-  async deleteUser(uid: unknown) {
+  async deleteUser(uid: string) {
     try {
-      await this.auth.deleteUser(uid as string);
+      await this.auth.deleteUser(uid);
     } catch (error) {
       throw new BadRequestException(error);
     }

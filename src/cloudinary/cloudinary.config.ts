@@ -10,9 +10,9 @@ export class CloudinaryConfig {
   }
 
   private initializeCloudinary() {
-    const cloudName = process.env.cloudName;
-    const apiKey = process.env.apiKey;
-    const apiSecret = process.env.apiSecret;
+    const cloudName = process.env.cloudinaryCloudName;
+    const apiKey = process.env.cloudinaryApiKey;
+    const apiSecret = process.env.cloudinaryApiSecret;
 
     cloudinary.config({
       cloud_name: cloudName,

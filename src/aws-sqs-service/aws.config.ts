@@ -7,7 +7,6 @@ import {
   DeleteMessageCommand,
 } from '@aws-sdk/client-sqs';
 import { BadRequestException } from '@nestjs/common';
-import { SQSMessage } from './aws.service';
 
 export class AwsConfig {
   private SQSurl: string;

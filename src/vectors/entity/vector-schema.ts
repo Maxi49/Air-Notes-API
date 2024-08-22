@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import { ObjectId } from 'mongodb';
 @Schema()
-export class Vector {
+export class Vector extends mongoose.document{
   @Prop({
     type: mongoose.Types.ObjectId,
     required: true,

@@ -4,8 +4,7 @@
 /build
 /.env
 
-*.json
-!/air-notes-65be4-firebase-adminsdk-5a9ty-9c3992622a.json
+/air-notes-65be4-firebase-adminsdk-5a9ty-9c3992622a.json
 
 # Logs
 logs

@@ -19,7 +19,7 @@ export class AwsConfig {
     this.SQSurl = process.env.SQSurl;
 
     this.sqsClient = new SQSClient({
-      region: 'sa-east-1',
+      region: process.env.awsRegion,
       credentials: {
         accessKeyId: publicKey,
         secretAccessKey: secretKey,

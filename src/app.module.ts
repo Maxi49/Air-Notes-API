@@ -9,11 +9,12 @@ import { MlApiModule } from 'src/machineLearningApi/mlApi.module';
 import { VectorModule } from './vectors/vectors.module';
 import { CloudinaryImageManagmentModule } from './cloudinary/cloudinaryImageManagment.module';
 import { AwsModule } from './aws-sqs-service/aws.module';
+import dotenv from 'dotenv';
+dotenv.config();
+
 @Module({
   imports: [
-    MongooseModule.forRoot(
-      'mongodb+srv://gimenezzmaximiliano:u7ty5OFFD2EO4cAp@air-note-db.xhrxjga.mongodb.net/?retryWrites=true&w=majority&appName=air-note-db',
-    ),
+    MongooseModule.forRoot(process.env.mongoURI),
     CloudinaryImageManagmentModule,
     NotesModule,
     MlApiModule,

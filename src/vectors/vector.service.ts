@@ -174,7 +174,7 @@ export class VectorService {
           ? (effort = 0)
           : (effort = effort - 1);
 
-        minVectorsInRange - 1 === 0
+        minVectorsInRange - 10 === 0
           ? (minVectorsInRange = 1)
           : (minVectorsInRange = minVectorsInRange - 10);
 

@@ -29,27 +29,23 @@ export function thresholdCalc(
   return thresholds;
 }
 
-export function isInThreshold(threshold: number[], value: number): boolean {
-  const [maxThreshold, minThreshold] = threshold;
-  console.log(threshold);
-  console.log(value);
-  if (value <= maxThreshold && value >= minThreshold) {
-    console.log(true);
-    return true;
+function euclideanDistance(vector1, vector2) {
+  let sum = 0;
+  for (let i = 0; i < vector1.length; i++) {
+    sum += Math.pow(vector1[i] - vector2[i], 2);
   }
-
-  console.log(false);
-  return false;
+  return Math.sqrt(sum);
 }
 
-export function calcEuclidianDistance(
-  userVector: number[],
-  noteVector: number[],
-): number {
-  let sumaCuadrados = 0;
-  for (let i = 0, j = 0; i < userVector.length; i++, j++) {
-    sumaCuadrados += Math.pow(userVector[i] - noteVector[i][j], 2);
-  }
+export function findClosestVectors(targetVector, vectorList) {
+  const distances = vectorList.map((vector) => ({
+    vector,
+    distance: euclideanDistance(targetVector, vector),
+  }));
 
-  return Math.sqrt(sumaCuadrados);
+  // Sort by distance
+  distances.sort((a, b) => a.distance - b.distance);
+
+  // Return the 20 closest vectors
+  return distances.slice(0, 20).map((item) => item.vector);
 }

@@ -10,7 +10,10 @@ import { Model } from 'mongoose';
 import { MlApiService } from 'src/machineLearningApi/mlApi.service';
 import { NotesService } from 'src/notes/notes.service';
 import { VectorType } from 'src/types/types';
-import { thresholdCalc } from './vector.helpers/thresholdCalc';
+import {
+  findClosestVectors,
+  thresholdCalc,
+} from './vector.helpers/vectorHelpers';
 
 @Injectable()
 export class VectorService {
@@ -144,10 +147,16 @@ export class VectorService {
   async vectorSearch(vector: Vector) {
     try {
       let minThresholdValue = 1;
-      let vectorsInRange = false;
+      let minVectorsInRange = 200;
       let results: Vector[];
+      let effort = 20;
 
-      while (!vectorsInRange) {
+      console.log(vector.vector);
+      while (effort > 0) {
+        console.log(minThresholdValue);
+        console.log(minVectorsInRange);
+        console.log(effort);
+
         const thresholds = thresholdCalc(vector.vector, minThresholdValue);
 
         results = await this.vectorModel.find({
@@ -158,13 +167,28 @@ export class VectorService {
             })),
           },
         });
-        console.log(results);
 
-        results.length && (vectorsInRange = true);
-        minThresholdValue += 1;
+        console.log(results.length);
+
+        results.length >= minVectorsInRange
+          ? (effort = 0)
+          : (effort = effort - 1);
+
+        minVectorsInRange - 1 === 0
+          ? (minVectorsInRange = 1)
+          : (minVectorsInRange = minVectorsInRange - 10);
+
+        minThresholdValue <= 20
+          ? (minThresholdValue = minThresholdValue + 1)
+          : (minThresholdValue = 20);
       }
 
-      return results;
+      const closestVectors: Vector[] = findClosestVectors(
+        vector.vector,
+        results,
+      );
+
+      return closestVectors;
     } catch (error) {
       throw new BadRequestException(error);
     }

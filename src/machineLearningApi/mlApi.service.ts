@@ -7,19 +7,19 @@ export class MlApiService {
 
   async sendVectorData(
     token: string,
-    postId: string,
+    noteId: string,
     text: string,
     imgUrl: string,
-  ): Promise<string> {
+  ): Promise<boolean> {
     try {
       await this.awsService.sendSQSMessage({
         token,
-        postId,
+        noteId,
         text,
         imgUrl,
       });
 
-      return;
+      return true;
     } catch (error) {
       throw new BadRequestException(error);
     }

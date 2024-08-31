@@ -20,7 +20,6 @@ export class VectorController {
     console.log(vector);
 
     const createdVector = await this.vectorService.createVector(
-      'post',
       user._id.toString(),
       vector.note,
       vector.vector,

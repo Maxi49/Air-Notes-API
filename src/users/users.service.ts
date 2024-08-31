@@ -146,14 +146,14 @@ export class UserService {
 
     console.log('user vector: ', userVector.vector);
 
-    const { vector: postVector } = await this.noteService.findNoteById(noteId);
+    const { vector: noteVector } = await this.noteService.findNoteById(noteId);
 
-    console.log('post vector: ', postVector);
+    console.log('note vector: ', noteVector);
 
     const resultVector = [];
 
-    for (let i = 0; i < postVector.length; i++) {
-      const product = userVector.vector[i] * postVector[i];
+    for (let i = 0; i < noteVector.length; i++) {
+      const product = userVector.vector[i] * noteVector[i];
       resultVector.push(product);
     }
 

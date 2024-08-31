@@ -9,14 +9,16 @@ import { Vector } from './entity/vector-schema';
 import { Model } from 'mongoose';
 import { MlApiService } from 'src/machineLearningApi/mlApi.service';
 import { NotesService } from 'src/notes/notes.service';
+import { VectorType } from 'src/types/types';
+import { thresholdCalc } from './vector.helpers/thresholdCalc';
 
 @Injectable()
 export class VectorService {
   constructor(
-    @InjectModel(Vector.name) private vectorModel: Model<Vector>,
-    private readonly mlApiService: MlApiService,
+    @InjectModel(Vector.name) public vectorModel: Model<Vector>,
+    public readonly mlApiService: MlApiService,
     @Inject(forwardRef(() => NotesService))
-    private readonly noteService: NotesService,
+    public readonly noteService: NotesService,
   ) {}
 
   async sendVectorIdentifier(
@@ -42,7 +44,6 @@ export class VectorService {
   }
 
   async createVector(
-    vectorType: 'user' | 'post',
     userId: string,
     noteId: string,
     vector: Vector,
@@ -52,17 +53,20 @@ export class VectorService {
       console.log(receiptHandle);
       console.log(vector);
       console.log(noteId);
-      const postVector = await this.vectorModel.create({
-        vectorType,
-        postId: noteId,
+      const noteVector = await this.vectorModel.create({
+        vectorType: VectorType.note,
+        noteId: noteId,
         vector: vector,
       });
+
+      console.log(receiptHandle);
+
       const updatedNote = await this.noteService.updateNote(
         userId.toString(),
         noteId.toString(),
         {
-          vector: postVector.vector,
-          vectorId: postVector._id.toString(),
+          vector: noteVector.vector,
+          vectorId: noteVector._id.toString(),
         },
       );
 
@@ -97,16 +101,14 @@ export class VectorService {
   }
 
   // TODO use this function when creating a new user
-  /* TODO Add vector types such as : postVector or userVector. So then it will filter the vectors in the correct way */
+  /* TODO Add vector types such as : noteVector or userVector. So then it will filter the vectors in the correct way */
 
-  async createUserVectorPreferences(userId: any) {
+  async createUserVectorPreferences(userId: string) {
     try {
-      const defaultPreferences = [
-        0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,
-      ];
+      const defaultPreferences = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 
-      const vector = this.vectorModel.create({
-        vectorType: 'user',
+      const vector = await this.vectorModel.create({
+        vectorType: VectorType.user,
         userId: userId,
         vector: defaultPreferences,
       });
@@ -134,22 +136,35 @@ export class VectorService {
   async vectorSimilaritySearch(vector: Vector) {
     try {
       console.log(vector.vector);
-      const filter = {
-        vectorType: { $eq: 'note' },
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
 
-        $vectorSearch: {
-          index: 'AtlasVectorSearchIndex',
-          path: 'vector',
-          queryVector: vector.vector,
-          maxResults: 10,
-        },
-      };
+  async vectorSearch(vector: Vector) {
+    try {
+      let minThresholdValue = 1;
+      let vectorsInRange = false;
+      let results: Vector[];
 
-      const similarities = await this.vectorModel.aggregate([
-        { $match: filter },
-      ]);
+      while (!vectorsInRange) {
+        const thresholds = thresholdCalc(vector.vector, minThresholdValue);
 
-      return similarities;
+        results = await this.vectorModel.find({
+          vectorType: VectorType.note,
+          vector: {
+            $all: thresholds.map((threshold) => ({
+              $elemMatch: { $gte: threshold[1], $lte: threshold[0] },
+            })),
+          },
+        });
+        console.log(results);
+
+        results.length && (vectorsInRange = true);
+        minThresholdValue += 1;
+      }
+
+      return results;
     } catch (error) {
       throw new BadRequestException(error);
     }

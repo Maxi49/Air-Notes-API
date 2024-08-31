@@ -1,7 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import mongoose from 'mongoose';
 
 @Schema({ timestamps: true })
-export class User {
+export class User extends mongoose.Document {
   @Prop({ required: true, unique: true })
   username: string;
 

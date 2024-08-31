@@ -1,4 +1,6 @@
-export class UserDto {
+import { User } from '../userSchema/user-schema';
+
+export class UserDto extends User {
   _id?: string;
   username: string;
   name: string;

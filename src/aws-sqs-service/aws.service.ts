@@ -4,7 +4,7 @@ import { SendMessageCommandOutput } from '@aws-sdk/client-sqs';
 
 export interface SQSMessage {
   token: string;
-  postId: string;
+  noteId: string;
   text: string;
   imgUrl: string;
 }
@@ -13,13 +13,14 @@ export interface SQSMessage {
 export class AwsService {
   constructor(private awsConfig: AwsConfig) {}
 
-  async sendSQSMessage(message): Promise<SendMessageCommandOutput> {
+  async sendSQSMessage(message: SQSMessage): Promise<SendMessageCommandOutput> {
     const messageSent = await this.awsConfig.sendMessage(message);
 
     return messageSent;
   }
 
   async deleteSQSMesssage(handleReceipt: string) {
+    console.log(handleReceipt);
     const deletedMessage = await this.awsConfig.killMessage(handleReceipt);
 
     return deletedMessage;

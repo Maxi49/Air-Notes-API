@@ -28,6 +28,18 @@ export class NotesService {
     return { notes, total };
   }
 
+  async getNotesBasedOnPreferences(userId: string) {
+    try {
+      const userVector = await this.vectorService.findVectorByUserId(userId);
+
+      const similarVectors = await this.vectorService.vectorSearch(userVector);
+
+      return similarVectors;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
   async findUserNotes(userId: any) {
     try {
       return await this.noteModel.find({ user: userId });
@@ -55,6 +67,7 @@ export class NotesService {
 
     // @ts-expect-error This cames here as a string
     const parsedLocation = JSON.parse(location);
+    console.log(file);
 
     const uploadedUrlImage =
       await this.cloudinaryImageManagmentService.uploadImage(file);
@@ -64,7 +77,7 @@ export class NotesService {
       publicImageId: uploadedUrlImage.public_id,
     };
 
-    const post = await this.noteModel.create({
+    const createNote = await this.noteModel.create({
       user: userId,
       title,
       country,
@@ -76,12 +89,12 @@ export class NotesService {
 
     this.vectorService.sendVectorIdentifier(
       token,
-      post._id.toString(),
+      createNote._id.toString(),
       description,
       uploadedUrlImage.url,
     );
 
-    return post;
+    return createNote;
   }
 
   async updateNote(userId: string, id: string, note: UpdateNoteDto) {

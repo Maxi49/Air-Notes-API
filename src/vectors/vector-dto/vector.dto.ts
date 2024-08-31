@@ -1,7 +1,9 @@
+import { VectorType } from 'src/types/types';
+
 export interface vectorDto {
   _id?: string;
-  postId?: string;
+  noteId?: string;
   userId?: string;
-  vectorType?: 'user' | 'post';
+  vectorType?: VectorType;
   vector?: Array<number> | number[];
 }

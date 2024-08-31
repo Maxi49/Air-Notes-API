@@ -32,6 +32,14 @@ export class NotesController {
     return await this.notesService.findAllNotes();
   }
 
+  @Get('fyp')
+  @UseGuards(AuthGuard)
+  async getNotesBasedOnPreferences(@CurrentUser() user: UserDto) {
+    const notes = await this.notesService.getNotesBasedOnPreferences(user._id);
+
+    return notes;
+  }
+
   @Get('user-notes')
   @UseGuards(AuthGuard)
   async getUserNotes(@CurrentUser() user: UserDto) {

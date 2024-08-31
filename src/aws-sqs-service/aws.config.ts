@@ -7,6 +7,7 @@ import {
   DeleteMessageCommand,
 } from '@aws-sdk/client-sqs';
 import { BadRequestException } from '@nestjs/common';
+import { SQSMessage } from './aws.service';
 
 export class AwsConfig {
   private SQSurl: string;
@@ -27,13 +28,13 @@ export class AwsConfig {
     });
   }
 
-  async sendMessage(message): Promise<SendMessageCommandOutput> {
+  async sendMessage(message: SQSMessage): Promise<SendMessageCommandOutput> {
     try {
-      console.log('message id: ', message.postId);
+      console.log('message id: ', message.noteId);
 
       const command = new SendMessageCommand({
-        MessageGroupId: message.postId,
-        MessageDeduplicationId: message.postId,
+        MessageGroupId: message.noteId,
+        MessageDeduplicationId: message.noteId,
         QueueUrl: this.SQSurl,
         MessageBody: JSON.stringify(message),
       });

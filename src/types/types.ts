@@ -12,3 +12,8 @@ export interface UserCredentials {
 }
 
 export type Scope = 'global' | 'local';
+
+export enum VectorType {
+  user = 'user',
+  note = 'note',
+}

@@ -2,8 +2,6 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Like } from './likeSchema/like-schema';
 import { Model } from 'mongoose';
-import { NotesService } from 'src/notes/notes.service';
-import { VectorService } from 'src/vectors/vector.service';
 import { UserService } from 'src/users/users.service';
 import { UserDto } from 'src/users/user-dto/user.dto';
 
@@ -11,9 +9,6 @@ import { UserDto } from 'src/users/user-dto/user.dto';
 export class LikeService {
   constructor(
     @InjectModel(Like.name) private likeModel: Model<Like>,
-
-    private readonly noteService: NotesService,
-    private readonly vectorService: VectorService,
     private readonly userService: UserService,
   ) {}
 
@@ -36,8 +31,6 @@ export class LikeService {
       });
 
       await this.userService.updateUserPreferences(user._id, noteId);
-
-      console.log('pasamos todo casi');
 
       return like;
     } catch (error) {

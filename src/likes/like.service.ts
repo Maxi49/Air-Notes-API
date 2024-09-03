@@ -35,14 +35,9 @@ export class LikeService {
         note: noteId,
       });
 
-      console.log('holis');
-      const smth = await this.userService.updateUserPreferences(
-        user._id,
-        noteId,
-      );
+      await this.userService.updateUserPreferences(user._id, noteId);
 
       console.log('pasamos todo casi');
-      console.log(smth);
 
       return like;
     } catch (error) {

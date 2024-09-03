@@ -40,7 +40,7 @@ export class NotesService {
     }
   }
 
-  async findUserNotes(userId: any) {
+  async findUserNotes(userId: string) {
     try {
       return await this.noteModel.find({ user: userId });
     } catch (error) {
@@ -49,11 +49,15 @@ export class NotesService {
   }
 
   async findNoteById(id: string) {
-    const note = await this.noteModel.findById(id);
-    if (!note) {
-      throw new NotFoundException();
+    try {
+      const note = await this.noteModel.findById(id);
+      if (!note) {
+        throw new NotFoundException();
+      }
+      return note;
+    } catch (error) {
+      throw new BadRequestException(error);
     }
-    return note;
   }
 
   async createNote(

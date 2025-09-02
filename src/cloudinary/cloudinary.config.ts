@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -21,7 +21,7 @@ export class CloudinaryConfig {
     });
   }
 
-  async uploadImage(img: any) {
+  async uploadImage(img: { path: string }): Promise<UploadApiResponse> {
     try {
       const uploadResult = await cloudinary.uploader.upload(img.path, {
         public_id: `${Date.now()}-${Math.random().toString(36).substring(7)}`,
@@ -33,7 +33,7 @@ export class CloudinaryConfig {
     }
   }
 
-  async optiomizeUrl(public_id: string) {
+  async optiomizeUrl(public_id: string): Promise<string> {
     const optimizeUrl = cloudinary.url(public_id, {
       fetch_format: 'auto',
       quality: 'auto',
@@ -42,7 +42,7 @@ export class CloudinaryConfig {
     return optimizeUrl;
   }
 
-  async cropUrl(public_id: string) {
+  async cropUrl(public_id: string): Promise<string> {
     const autoCropUrl = cloudinary.url(public_id, {
       crop: 'auto',
       gravity: 'auto',
@@ -54,16 +54,18 @@ export class CloudinaryConfig {
   }
 
   async deleteCloudinaryImages(
-    publicId?: string | boolean,
+    publicId?: string,
     imagesList?: string[],
   ): Promise<boolean> {
     try {
-      if (imagesList.length) {
+      if (imagesList && imagesList.length > 0) {
         await cloudinary.api.delete_resources(imagesList);
         return true;
       }
 
-      await cloudinary.uploader.destroy(publicId as string);
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId);
+      }
 
       return true;
     } catch (error) {

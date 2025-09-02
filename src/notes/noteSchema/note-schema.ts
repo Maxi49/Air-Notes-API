@@ -1,4 +1,4 @@
-import { Scope } from '@nestjs/common';
+import { Scope } from 'src/types/types';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 
@@ -18,8 +18,8 @@ export class Note extends mongoose.Document {
     coordinates: { type: [Number], required: true },
   })
   location: {
-    type: string;
-    coordinates: number[];
+    type: 'Point';
+    coordinates: [number, number];
   };
 
   @Prop({

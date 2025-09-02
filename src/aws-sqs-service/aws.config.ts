@@ -5,6 +5,7 @@ import {
   SQSClient,
   SendMessageCommandOutput,
   DeleteMessageCommand,
+  DeleteMessageCommandOutput,
 } from '@aws-sdk/client-sqs';
 import { BadRequestException } from '@nestjs/common';
 import { SQSMessage } from './aws.service';
@@ -47,7 +48,9 @@ export class AwsConfig {
     }
   }
 
-  async killMessage(handleReceipt: string) {
+  async killMessage(
+    handleReceipt: string,
+  ): Promise<DeleteMessageCommandOutput> {
     try {
       const command = new DeleteMessageCommand({
         QueueUrl: this.SQSurl,

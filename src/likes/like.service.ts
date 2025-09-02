@@ -12,7 +12,7 @@ export class LikeService {
     private readonly userService: UserService,
   ) {}
 
-  async getLikes(userId: string, noteId: string): Promise<Like[] | unknown[]> {
+  async getLikes(userId: string, noteId: string): Promise<Like[]> {
     try {
       const like = await this.likeModel.find({ note: noteId, user: userId });
       return like;

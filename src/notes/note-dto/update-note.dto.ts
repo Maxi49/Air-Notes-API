@@ -1,5 +1,10 @@
-import { Scope } from '@nestjs/common';
 import { IsOptional, IsString, IsMongoId, IsArray } from 'class-validator';
+import { Scope } from 'src/types/types';
+
+type GeoPoint = {
+  type: 'Point';
+  coordinates: [number, number];
+};
 
 export class UpdateNoteDto {
   @IsMongoId()
@@ -15,10 +20,7 @@ export class UpdateNoteDto {
   description?: string;
 
   @IsOptional()
-  location?: {
-    type: string;
-    coordinates: number[];
-  };
+  location?: GeoPoint;
 
   @IsOptional()
   image?: {

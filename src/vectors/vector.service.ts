@@ -10,10 +10,7 @@ import { Model } from 'mongoose';
 import { MlApiService } from 'src/machineLearningApi/mlApi.service';
 import { NotesService } from 'src/notes/notes.service';
 import { VectorType } from 'src/types/types';
-import {
-  findClosestVectors,
-  thresholdCalc,
-} from './vector.helpers/vectorHelpers';
+import { findClosestVectors } from './vector.helpers/vectorHelpers';
 
 @Injectable()
 export class VectorService {
@@ -29,7 +26,7 @@ export class VectorService {
     noteId: string,
     descriptionText: string,
     image: string,
-  ): Promise<boolean> {
+  ): Promise<void> {
     try {
       console.log(noteId);
 
@@ -39,7 +36,6 @@ export class VectorService {
         descriptionText,
         image,
       );
-
       return;
     } catch (error) {
       throw new BadRequestException(error);
@@ -49,13 +45,10 @@ export class VectorService {
   async createVector(
     userId: string,
     noteId: string,
-    vector: Vector,
+    vector: number[],
     receiptHandle: string,
   ) {
     try {
-      console.log(receiptHandle);
-      console.log(vector);
-      console.log(noteId);
       const noteVector = await this.vectorModel.create({
         vectorType: VectorType.note,
         noteId: noteId,
@@ -83,14 +76,17 @@ export class VectorService {
     }
   }
 
-  async updateVector(vectorId: string, vector: number[]): Promise<Vector> {
-    await this.vectorModel.findByIdAndUpdate(
+  async updateVector(
+    vectorId: string,
+    vector: number[],
+  ): Promise<Vector | null> {
+    const updated = await this.vectorModel.findByIdAndUpdate(
       vectorId,
       { vector: vector },
       { new: true },
     );
 
-    return;
+    return updated;
   }
 
   async deleteVector(vectorId: string): Promise<boolean> {
@@ -122,21 +118,21 @@ export class VectorService {
     }
   }
 
-  async findVectorByUserId(userId: string): Promise<Vector> {
+  async findVectorByUserId(userId: string): Promise<Vector | null> {
     try {
       console.log('user id: ', userId);
-      const vector: Vector | unknown = await this.vectorModel.findOne({
+      const vector: Vector | null = await this.vectorModel.findOne({
         userId: userId,
       });
       console.log(vector);
 
-      return vector as Vector;
+      return vector;
     } catch (error) {
       throw new BadRequestException(error);
     }
   }
 
-  async vectorSimilaritySearch(vector: Vector) {
+  async vectorSimilaritySearch(vector: Vector): Promise<void> {
     try {
       console.log(vector.vector);
     } catch (error) {
@@ -144,51 +140,22 @@ export class VectorService {
     }
   }
 
-  async vectorSearch(vector: Vector) {
+  async vectorSearch(vector: Vector, limit = 20): Promise<Vector[]> {
     try {
-      let minThresholdValue = 1;
-      let minVectorsInRange = 200;
-      let results: Vector[];
-      let effort = 20;
+      // Fetch only note vectors with minimal fields for speed
+      const candidates: Pick<Vector, '_id' | 'noteId' | 'vector'>[] =
+        await this.vectorModel
+          .find({ vectorType: VectorType.note })
+          .select({ vector: 1, noteId: 1 })
+          .lean();
 
-      console.log(vector.vector);
-      while (effort > 0) {
-        console.log(minThresholdValue);
-        console.log(minVectorsInRange);
-        console.log(effort);
+      if (!candidates?.length) return [] as unknown as Vector[];
 
-        const thresholds = thresholdCalc(vector.vector, minThresholdValue);
+      const top = findClosestVectors(vector.vector, candidates as any, limit);
 
-        results = await this.vectorModel.find({
-          vectorType: VectorType.note,
-          vector: {
-            $all: thresholds.map((threshold) => ({
-              $elemMatch: { $gte: threshold[1], $lte: threshold[0] },
-            })),
-          },
-        });
-
-        console.log(results.length);
-
-        results.length >= minVectorsInRange
-          ? (effort = 0)
-          : (effort = effort - 1);
-
-        minVectorsInRange - 10 === 0
-          ? (minVectorsInRange = 1)
-          : (minVectorsInRange = minVectorsInRange - 10);
-
-        minThresholdValue <= 20
-          ? (minThresholdValue = minThresholdValue + 1)
-          : (minThresholdValue = 20);
-      }
-
-      const closestVectors: Vector[] = findClosestVectors(
-        vector.vector,
-        results,
-      );
-
-      return closestVectors;
+      // Return as Vector-like objects (compatible with existing callers)
+      // If not using .lean(), we could refetch; here we cast as any since only _id/noteId/vector are used downstream
+      return top as unknown as Vector[];
     } catch (error) {
       throw new BadRequestException(error);
     }

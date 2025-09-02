@@ -29,23 +29,27 @@ export function thresholdCalc(
   return thresholds;
 }
 
-function euclideanDistance(vector1, vector2) {
+export function euclideanDistance(a: number[], b: number[]): number {
   let sum = 0;
-  for (let i = 0; i < vector1.length; i++) {
-    sum += Math.pow(vector1[i] - vector2[i], 2);
+  const len = Math.min(a.length, b.length);
+  for (let i = 0; i < len; i++) {
+    const d = a[i] - b[i];
+    sum += d * d;
   }
   return Math.sqrt(sum);
 }
 
-export function findClosestVectors(targetVector, vectorList) {
-  const distances = vectorList.map((vector) => ({
-    vector,
-    distance: euclideanDistance(targetVector, vector),
+export function findClosestVectors(
+  targetVector: number[],
+  vectorList: Array<{ vector: number[] }>,
+  limit = 20,
+) {
+  const distances = vectorList.map((item) => ({
+    item,
+    distance: euclideanDistance(targetVector, item.vector),
   }));
 
-  // Sort by distance
   distances.sort((a, b) => a.distance - b.distance);
 
-  // Return the 20 closest vectors
-  return distances.slice(0, 20).map((item) => item.vector);
+  return distances.slice(0, limit).map((d) => d.item);
 }

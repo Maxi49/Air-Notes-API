@@ -10,6 +10,7 @@ import {
   Auth,
 } from 'firebase/auth';
 import { FirebaseAuthConfig } from './firebaseAuth.config';
+import type { User, UserCredential } from 'firebase/auth';
 
 @Injectable()
 export class FirebaseAuthService {
@@ -20,7 +21,7 @@ export class FirebaseAuthService {
     this.auth = getAuth();
   }
 
-  async register(email: string, pass: string) {
+  async register(email: string, pass: string): Promise<UserCredential> {
     try {
       const newUser = await createUserWithEmailAndPassword(
         this.auth,
@@ -34,7 +35,7 @@ export class FirebaseAuthService {
     }
   }
 
-  async login(email: string, password: string) {
+  async login(email: string, password: string): Promise<User> {
     try {
       const userCredentials = await signInWithEmailAndPassword(
         this.auth,

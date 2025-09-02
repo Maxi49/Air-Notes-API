@@ -13,6 +13,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+
 import { NotesService } from './notes.service';
 import { HttpExceptionFilter } from 'src/ErrorHandlers/errorHandlers';
 import { AuthGuard } from 'src/Guards/auth.guard';
@@ -21,6 +22,7 @@ import { UpdateNoteDto } from './note-dto/update-note.dto';
 import { CurrentUser } from 'src/CustomDecorators/getCurrentUser';
 import { UserDto } from 'src/users/user-dto/user.dto';
 import { CreateNoteDto } from './note-dto/create-note.dto';
+import type { Express } from 'express';
 
 @Controller('notes')
 @UseFilters(new HttpExceptionFilter())
@@ -66,8 +68,8 @@ export class NotesController {
   async create(
     @Headers('Authorization') token: string,
     @Body() note: CreateNoteDto,
-    @CurrentUser() user: any,
-    @UploadedFile() file: any,
+    @CurrentUser() user: UserDto,
+    @UploadedFile() file: Express.Multer.File,
   ) {
     try {
       console.log(token);

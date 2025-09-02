@@ -13,6 +13,11 @@ import { UpdateNoteDto } from './note-dto/update-note.dto';
 import { VectorService } from 'src/vectors/vector.service';
 import { CloudinaryConfig } from 'src/cloudinary/cloudinary.config';
 
+type GeoPoint = {
+  type: 'Point';
+  coordinates: [number, number];
+};
+
 @Injectable()
 export class NotesService {
   constructor(
@@ -22,25 +27,47 @@ export class NotesService {
     private readonly vectorService: VectorService,
   ) {}
 
-  async findAllNotes() {
+  async findAllNotes(): Promise<{ notes: Note[]; total: number }> {
     const notes = await this.noteModel.find({});
     const total = await this.noteModel.countDocuments({});
     return { notes, total };
   }
 
-  async getNotesBasedOnPreferences(userId: string) {
+  async getNotesBasedOnPreferences(userId: string): Promise<Note[]> {
     try {
       const userVector = await this.vectorService.findVectorByUserId(userId);
+      if (!userVector) return [];
 
-      const similarVectors = await this.vectorService.vectorSearch(userVector);
+      const similarVectors = await this.vectorService.vectorSearch(
+        userVector,
+        20,
+      );
 
-      return similarVectors;
+      const noteIds = (similarVectors || [])
+        .map((v: any) => v.noteId)
+        .filter(Boolean);
+
+      if (!noteIds.length) return [];
+
+      const notes = await this.noteModel.find({ _id: { $in: noteIds } }).lean();
+
+      const order = new Map<string, number>();
+      noteIds.forEach((id: string, idx: number) =>
+        order.set(id.toString(), idx),
+      );
+      const sorted = notes.sort(
+        (a: any, b: any) =>
+          (order.get(a._id.toString()) ?? 0) -
+          (order.get(b._id.toString()) ?? 0),
+      );
+
+      return sorted as unknown as Note[];
     } catch (error) {
       throw new BadRequestException(error);
     }
   }
 
-  async findUserNotes(userId: string) {
+  async findUserNotes(userId: string): Promise<Note[]> {
     try {
       return await this.noteModel.find({ user: userId });
     } catch (error) {
@@ -48,7 +75,7 @@ export class NotesService {
     }
   }
 
-  async findNoteById(id: string) {
+  async findNoteById(id: string): Promise<Note> {
     try {
       const note = await this.noteModel.findById(id);
       if (!note) {
@@ -63,14 +90,16 @@ export class NotesService {
   async createNote(
     userId: string,
     note: CreateNoteDto,
-    file: any,
+    file: Express.Multer.File,
     token: string,
-  ) {
+  ): Promise<Note> {
     const { description, location, title, country, scope } = note;
     console.log('userId provided: ', userId);
 
-    // @ts-expect-error This cames here as a string
-    const parsedLocation = JSON.parse(location);
+    const parsedLocation: GeoPoint =
+      typeof location === 'string'
+        ? JSON.parse(location)
+        : (location as GeoPoint);
     console.log(file);
 
     const uploadedUrlImage =
@@ -91,7 +120,7 @@ export class NotesService {
       scope,
     });
 
-    this.vectorService.sendVectorIdentifier(
+    await this.vectorService.sendVectorIdentifier(
       token,
       createNote._id.toString(),
       description,
@@ -101,8 +130,12 @@ export class NotesService {
     return createNote;
   }
 
-  async updateNote(userId: string, id: string, note: UpdateNoteDto) {
-    const updatedNote = await this.noteModel.findByIdAndUpdate(
+  async updateNote(
+    userId: string,
+    id: string,
+    note: UpdateNoteDto,
+  ): Promise<Note | null> {
+    const updatedNote = await this.noteModel.findOneAndUpdate(
       { _id: id, user: userId },
       { ...note },
       { new: true },
@@ -110,25 +143,29 @@ export class NotesService {
     return updatedNote;
   }
 
-  async removeNote(noteId: string, userId: string) {
+  async removeNote(noteId: string, userId: string): Promise<boolean> {
     try {
-      const deletedNote = await this.noteModel.findByIdAndDelete({
+      const deletedNote = await this.noteModel.findOneAndDelete({
         _id: noteId,
-        userId,
+        user: userId,
       });
 
-      await this.vectorService.deleteVector(deletedNote.vectorId);
+      if (deletedNote?.vectorId) {
+        await this.vectorService.deleteVector(deletedNote.vectorId);
+      }
 
-      await this.cloudinaryImageManagmentService.deleteCloudinaryImages(
-        deletedNote.image.publicImageId,
-      );
+      if (deletedNote?.image?.publicImageId) {
+        await this.cloudinaryImageManagmentService.deleteCloudinaryImages(
+          deletedNote.image.publicImageId,
+        );
+      }
       return true;
     } catch (error) {
       throw new BadRequestException(error);
     }
   }
 
-  async removeAllUserNotes(userId: string) {
+  async removeAllUserNotes(userId: string): Promise<boolean> {
     try {
       await this.noteModel.deleteMany({ user: userId });
       return true;
@@ -138,7 +175,7 @@ export class NotesService {
   }
 
   /* Si yo solo necesito el valor actual de la ubicacion del usuario, no se lo voy a pasar de esa manera evidentemete, si no que se lo pasaria desde propio front con la ubicacion actualizada*/
-  async findNotesNearUser(userId: string) {
+  async findNotesNearUser(userId: string): Promise<void> {
     try {
       console.log(userId);
       // TODO Re-do the logic of this function
